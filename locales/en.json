@@ -1,0 +1,58 @@
+{
+  "langLabel": "EN",
+  "header": {
+    "subtitle": "I Ching Divination",
+    "title": "I Ching"
+  },
+  "question": {
+    "label": "Your Question (optional)",
+    "placeholder": "Enter the matter you wish to consult…",
+    "display": "Question"
+  },
+  "cast": {
+    "casting": "Casting line {{step}} of 6…",
+    "button": "☯ Cast"
+  },
+  "card": {
+    "primary": "Primary",
+    "derived": "Derived",
+    "hexNum": "Hex. {{num}}"
+  },
+  "changing": {
+    "title": "Changing Lines",
+    "yangLine": "Old Yang ○",
+    "yinLine": "Old Yin ✕",
+    "yangChange": "Yang → Yin",
+    "yinChange": "Yin → Yang",
+    "lineSuffix": " line"
+  },
+  "actions": {
+    "copyHint": "── Copy or export to paste into an AI ──",
+    "copy": "Copy Reading",
+    "copied": "Copied!",
+    "export": "Export .txt",
+    "preview": "Preview",
+    "reset": "New Reading"
+  },
+  "line": {
+    "0": "1st",
+    "1": "2nd",
+    "2": "3rd",
+    "3": "4th",
+    "4": "5th",
+    "5": "Top"
+  },
+  "summary": {
+    "header": "[I Ching Reading]",
+    "time": "Date: ",
+    "question": "Question: ",
+    "primary": "Primary Hexagram: ",
+    "judgment": "Judgment: ",
+    "changing": "Changing Lines:",
+    "derived": "Derived Hexagram: ",
+    "footer": "Please interpret this reading in light of the question above.",
+    "yangChg": "Old Yang ○ (yang → yin)",
+    "yinChg": "Old Yin ✕ (yin → yang)",
+    "filePrefix": "reading"
+  }
+}

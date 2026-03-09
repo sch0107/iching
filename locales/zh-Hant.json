@@ -1,0 +1,58 @@
+{
+  "langLabel": "繁",
+  "header": {
+    "subtitle": "周易占卜",
+    "title": "易經起卦"
+  },
+  "question": {
+    "label": "所 問 之 事（可留空）",
+    "placeholder": "在此輸入你想占問的事情…",
+    "display": "所問之事"
+  },
+  "cast": {
+    "casting": "正在搖卦… 第 {{step}} 爻",
+    "button": "☯ 起 卦"
+  },
+  "card": {
+    "primary": "本　卦",
+    "derived": "變　卦",
+    "hexNum": "第{{num}}卦"
+  },
+  "changing": {
+    "title": "變 爻 詳 情",
+    "yangLine": "老陽 ○",
+    "yinLine": "老陰 ✕",
+    "yangChange": "陽極變陰",
+    "yinChange": "陰極變陽",
+    "lineSuffix": "爻"
+  },
+  "actions": {
+    "copyHint": "── 複製或匯出，貼給 AI 解讀 ──",
+    "copy": "複製卦象",
+    "copied": "已複製！",
+    "export": "匯出 .txt",
+    "preview": "預 覽",
+    "reset": "重 新 起 卦"
+  },
+  "line": {
+    "0": "初",
+    "1": "二",
+    "2": "三",
+    "3": "四",
+    "4": "五",
+    "5": "上"
+  },
+  "summary": {
+    "header": "【易經起卦結果】",
+    "time": "占卜時間：",
+    "question": "所問之事：",
+    "primary": "本卦：",
+    "judgment": "卦辭：",
+    "changing": "變爻：",
+    "derived": "變卦：",
+    "footer": "請根據以上卦象，結合所問之事給出解讀。",
+    "yangChg": "老陽○（陽極變陰）",
+    "yinChg": "老陰✕（陰極變陽）",
+    "filePrefix": "卦象"
+  }
+}
