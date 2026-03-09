@@ -11,83 +11,126 @@ const TRIGRAMS = {
   "000": { name: "坤", nature: "地" },
 };
 
+/*
+  Encoding:
+  - Line values: 7=少阳(—), 8=少阴(- -), 9=老阳(—○), 6=老阴(- -✕)
+  - lines[0]=初爻(bottom), lines[5]=上爻(top)
+  - Hex key = lines[0..5].map(lineVal).join(""), i.e. bottom→top
+  - Lower trigram = lines[0..2], upper trigram = lines[3..5]
+  - TRIGRAMS encoding: top-to-bottom within trigram
+      乾☰=111  兑☱=011  离☲=101  震☳=001
+      巽☴=110  坎☵=010  艮☶=100  坤☷=000
+  - Upper trigram key: [line5, line4, line3].join("")
+  - Lower trigram key: [line2, line1, line0].join("")
+*/
+
+// Key = [初爻,二爻,三爻,四爻,五爻,上爻].join(""), 1=阳 0=阴
+// Lower trigram = first 3 digits, upper trigram = last 3 digits
 const HEXAGRAM_DB = {
-  "111111": { num: 1,  name: "乾", title: "乾为天", judgment: "元亨利贞。" },
-  "000000": { num: 2,  name: "坤", title: "坤为地", judgment: "元亨，利牝马之贞。" },
-  "010001": { num: 3,  name: "屯", title: "水雷屯", judgment: "元亨利贞，勿用有攸往，利建侯。" },
-  "100010": { num: 4,  name: "蒙", title: "山水蒙", judgment: "亨。匪我求童蒙，童蒙求我。" },
-  "010111": { num: 5,  name: "需", title: "水天需", judgment: "有孚，光亨，贞吉，利涉大川。" },
-  "111010": { num: 6,  name: "讼", title: "天水讼", judgment: "有孚，窒惕，中吉，终凶。" },
-  "010000": { num: 7,  name: "师", title: "地水师", judgment: "贞，丈人吉，无咎。" },
-  "000010": { num: 8,  name: "比", title: "水地比", judgment: "吉。原筮元永贞，无咎。" },
-  "110111": { num: 9,  name: "小畜", title: "风天小畜", judgment: "亨。密云不雨，自我西郊。" },
-  "111011": { num: 10, name: "履", title: "天泽履", judgment: "履虎尾，不咥人，亨。" },
-  "000111": { num: 11, name: "泰", title: "地天泰", judgment: "小往大来，吉亨。" },
-  "111000": { num: 12, name: "否", title: "天地否", judgment: "否之匪人，不利君子贞。" },
-  "111101": { num: 13, name: "同人", title: "天火同人", judgment: "同人于野，亨，利涉大川。" },
-  "101111": { num: 14, name: "大有", title: "火天大有", judgment: "元亨。" },
-  "000100": { num: 15, name: "谦", title: "地山谦", judgment: "亨，君子有终。" },
-  "001000": { num: 16, name: "豫", title: "雷地豫", judgment: "利建侯行师。" },
-  "001011": { num: 17, name: "随", title: "泽雷随", judgment: "元亨利贞，无咎。" },
-  "110100": { num: 18, name: "蛊", title: "山风蛊", judgment: "元亨，利涉大川。" },
-  "000011": { num: 19, name: "临", title: "地泽临", judgment: "元亨利贞，至于八月有凶。" },
-  "110000": { num: 20, name: "观", title: "风地观", judgment: "盥而不荐，有孚颙若。" },
-  "101001": { num: 21, name: "噬嗑", title: "火雷噬嗑", judgment: "亨，利用狱。" },
-  "100101": { num: 22, name: "贲", title: "山火贲", judgment: "亨，小利有攸往。" },
-  "100000": { num: 23, name: "剥", title: "山地剥", judgment: "不利有攸往。" },
-  "000001": { num: 24, name: "复", title: "地雷复", judgment: "亨，出入无疾，朋来无咎。" },
-  "111001": { num: 25, name: "无妄", title: "天雷无妄", judgment: "元亨利贞，其匪正有眚。" },
-  "100111": { num: 26, name: "大畜", title: "山天大畜", judgment: "利贞，不家食吉，利涉大川。" },
-  "100001": { num: 27, name: "颐", title: "山雷颐", judgment: "贞吉，观颐，自求口实。" },
+  "111111": { num: 1,  name: "乾",  title: "乾为天",   judgment: "元亨利贞。" },
+  "000000": { num: 2,  name: "坤",  title: "坤为地",   judgment: "元亨，利牝马之贞。" },
+  "100010": { num: 3,  name: "屯",  title: "水雷屯",   judgment: "元亨利贞，勿用有攸往，利建侯。" },
+  "010001": { num: 4,  name: "蒙",  title: "山水蒙",   judgment: "亨。匪我求童蒙，童蒙求我。" },
+  "111010": { num: 5,  name: "需",  title: "水天需",   judgment: "有孚，光亨，贞吉，利涉大川。" },
+  "010111": { num: 6,  name: "讼",  title: "天水讼",   judgment: "有孚，窒惕，中吉，终凶。" },
+  "010000": { num: 7,  name: "师",  title: "地水师",   judgment: "贞，丈人吉，无咎。" },
+  "000010": { num: 8,  name: "比",  title: "水地比",   judgment: "吉。原筮，元永贞，无咎。" },
+  "111011": { num: 9,  name: "小畜", title: "风天小畜", judgment: "亨。密云不雨，自我西郊。" },
+  "110111": { num: 10, name: "履",  title: "天泽履",   judgment: "履虎尾，不咥人，亨。" },
+  "111000": { num: 11, name: "泰",  title: "地天泰",   judgment: "小往大来，吉亨。" },
+  "000111": { num: 12, name: "否",  title: "天地否",   judgment: "否之匪人，不利君子贞。" },
+  "101111": { num: 13, name: "同人", title: "天火同人", judgment: "同人于野，亨，利涉大川。" },
+  "111101": { num: 14, name: "大有", title: "火天大有", judgment: "元亨。" },
+  "001000": { num: 15, name: "谦",  title: "地山谦",   judgment: "亨，君子有终。" },
+  "000100": { num: 16, name: "豫",  title: "雷地豫",   judgment: "利建侯行师。" },
+  "100110": { num: 17, name: "随",  title: "泽雷随",   judgment: "元亨利贞，无咎。" },
+  "011001": { num: 18, name: "蛊",  title: "山风蛊",   judgment: "元亨，利涉大川。先甲三日，后甲三日。" },
+  "110000": { num: 19, name: "临",  title: "地泽临",   judgment: "元亨利贞，至于八月有凶。" },
+  "000011": { num: 20, name: "观",  title: "风地观",   judgment: "盥而不荐，有孚颙若。" },
+  "100101": { num: 21, name: "噬嗑", title: "火雷噬嗑", judgment: "亨，利用狱。" },
+  "101001": { num: 22, name: "贲",  title: "山火贲",   judgment: "亨，小利有攸往。" },
+  "000001": { num: 23, name: "剥",  title: "山地剥",   judgment: "不利有攸往。" },
+  "100000": { num: 24, name: "复",  title: "地雷复",   judgment: "亨，出入无疾，朋来无咎。" },
+  "100111": { num: 25, name: "无妄", title: "天雷无妄", judgment: "元亨利贞，其匪正有眚，不利有攸往。" },
+  "111001": { num: 26, name: "大畜", title: "山天大畜", judgment: "利贞，不家食吉，利涉大川。" },
+  "100001": { num: 27, name: "颐",  title: "山雷颐",   judgment: "贞吉，观颐，自求口实。" },
   "011110": { num: 28, name: "大过", title: "泽风大过", judgment: "栋桡，利有攸往，亨。" },
-  "010010": { num: 29, name: "坎", title: "坎为水", judgment: "习坎，有孚，维心亨，行有尚。" },
-  "101101": { num: 30, name: "离", title: "离为火", judgment: "利贞，亨。畜牝牛，吉。" },
-  "011100": { num: 31, name: "咸", title: "泽山咸", judgment: "亨利贞，取女吉。" },
-  "001110": { num: 32, name: "恒", title: "雷风恒", judgment: "亨，无咎，利贞，利有攸往。" },
-  "001111": { num: 33, name: "遁", title: "天山遁", judgment: "亨，小利贞。" },
+  "010010": { num: 29, name: "坎",  title: "坎为水",   judgment: "习坎，有孚，维心亨，行有尚。" },
+  "101101": { num: 30, name: "离",  title: "离为火",   judgment: "利贞，亨。畜牝牛，吉。" },
+  "001110": { num: 31, name: "咸",  title: "泽山咸",   judgment: "亨利贞，取女吉。" },
+  "011100": { num: 32, name: "恒",  title: "雷风恒",   judgment: "亨，无咎，利贞，利有攸往。" },
+  "001111": { num: 33, name: "遁",  title: "天山遁",   judgment: "亨，小利贞。" },
   "111100": { num: 34, name: "大壮", title: "雷天大壮", judgment: "利贞。" },
-  "000101": { num: 35, name: "晋", title: "火地晋", judgment: "康侯用锡马蕃庶，昼日三接。" },
+  "000101": { num: 35, name: "晋",  title: "火地晋",   judgment: "康侯用锡马蕃庶，昼日三接。" },
   "101000": { num: 36, name: "明夷", title: "地火明夷", judgment: "利艰贞。" },
-  "101110": { num: 37, name: "家人", title: "风火家人", judgment: "利女贞。" },
-  "011101": { num: 38, name: "睽", title: "火泽睽", judgment: "小事吉。" },
-  "010100": { num: 39, name: "蹇", title: "水山蹇", judgment: "利西南，不利东北；利见大人，贞吉。" },
-  "001010": { num: 40, name: "解", title: "雷水解", judgment: "利西南，无所往，其来复吉。" },
-  "100011": { num: 41, name: "损", title: "山泽损", judgment: "有孚，元吉，无咎，可贞。" },
-  "110001": { num: 42, name: "益", title: "风雷益", judgment: "利有攸往，利涉大川。" },
-  "011111": { num: 43, name: "夬", title: "泽天夬", judgment: "扬于王庭，孚号，有厉。" },
-  "111110": { num: 44, name: "姤", title: "天风姤", judgment: "女壮，勿用取女。" },
-  "011000": { num: 45, name: "萃", title: "泽地萃", judgment: "亨，王假有庙，利见大人。" },
-  "000110": { num: 46, name: "升", title: "地风升", judgment: "元亨，用见大人，勿恤，南征吉。" },
-  "011010": { num: 47, name: "困", title: "泽水困", judgment: "亨，贞大人吉，无咎，有言不信。" },
-  "010110": { num: 48, name: "井", title: "水风井", judgment: "改邑不改井，无丧无得。" },
-  "001001": { num: 51, name: "震", title: "震为雷", judgment: "亨，震来虩虩，笑言哑哑。" },
-  "100100": { num: 52, name: "艮", title: "艮为山", judgment: "艮其背，不获其身，无咎。" },
-  "110100": { num: 53, name: "渐", title: "风山渐", judgment: "女归吉，利贞。" },
-  "001011": { num: 54, name: "归妹", title: "雷泽归妹", judgment: "征凶，无攸利。" },
-  "001101": { num: 55, name: "丰", title: "雷火丰", judgment: "亨，王假之，勿忧，宜日中。" },
-  "101100": { num: 56, name: "旅", title: "火山旅", judgment: "小亨，旅贞吉。" },
-  "110110": { num: 57, name: "巽", title: "巽为风", judgment: "小亨，利有攸往，利见大人。" },
-  "011011": { num: 58, name: "兑", title: "兑为泽", judgment: "亨，利贞。" },
-  "110010": { num: 59, name: "涣", title: "风水涣", judgment: "亨，王假有庙，利涉大川，利贞。" },
-  "010011": { num: 60, name: "节", title: "水泽节", judgment: "亨，苦节不可贞。" },
+  "101011": { num: 37, name: "家人", title: "风火家人", judgment: "利女贞。" },
+  "110101": { num: 38, name: "睽",  title: "火泽睽",   judgment: "小事吉。" },
+  "001010": { num: 39, name: "蹇",  title: "水山蹇",   judgment: "利西南，不利东北；利见大人，贞吉。" },
+  "010100": { num: 40, name: "解",  title: "雷水解",   judgment: "利西南，无所往，其来复吉。" },
+  "110001": { num: 41, name: "损",  title: "山泽损",   judgment: "有孚，元吉，无咎，可贞，利有攸往。" },
+  "100011": { num: 42, name: "益",  title: "风雷益",   judgment: "利有攸往，利涉大川。" },
+  "111110": { num: 43, name: "夬",  title: "泽天夬",   judgment: "扬于王庭，孚号，有厉，告自邑，不利即戎，利有攸往。" },
+  "011111": { num: 44, name: "姤",  title: "天风姤",   judgment: "女壮，勿用取女。" },
+  "000110": { num: 45, name: "萃",  title: "泽地萃",   judgment: "亨，王假有庙，利见大人，亨，利贞。" },
+  "011000": { num: 46, name: "升",  title: "地风升",   judgment: "元亨，用见大人，勿恤，南征吉。" },
+  "010110": { num: 47, name: "困",  title: "泽水困",   judgment: "亨，贞大人吉，无咎，有言不信。" },
+  "011010": { num: 48, name: "井",  title: "水风井",   judgment: "改邑不改井，无丧无得，往来井井。" },
+  "101110": { num: 49, name: "革",  title: "泽火革",   judgment: "己日乃孚，元亨利贞，悔亡。" },
+  "011101": { num: 50, name: "鼎",  title: "火风鼎",   judgment: "元吉，亨。" },
+  "100100": { num: 51, name: "震",  title: "震为雷",   judgment: "亨，震来虩虩，笑言哑哑，震惊百里，不丧匕鬯。" },
+  "001001": { num: 52, name: "艮",  title: "艮为山",   judgment: "艮其背，不获其身，行其庭，不见其人，无咎。" },
+  "001011": { num: 53, name: "渐",  title: "风山渐",   judgment: "女归吉，利贞。" },
+  "110100": { num: 54, name: "归妹", title: "雷泽归妹", judgment: "征凶，无攸利。" },
+  "101100": { num: 55, name: "丰",  title: "雷火丰",   judgment: "亨，王假之，勿忧，宜日中。" },
+  "001101": { num: 56, name: "旅",  title: "火山旅",   judgment: "小亨，旅贞吉。" },
+  "011011": { num: 57, name: "巽",  title: "巽为风",   judgment: "小亨，利有攸往，利见大人。" },
+  "110110": { num: 58, name: "兑",  title: "兑为泽",   judgment: "亨，利贞。" },
+  "010011": { num: 59, name: "涣",  title: "风水涣",   judgment: "亨，王假有庙，利涉大川，利贞。" },
+  "110010": { num: 60, name: "节",  title: "水泽节",   judgment: "亨，苦节不可贞。" },
   "110011": { num: 61, name: "中孚", title: "风泽中孚", judgment: "豚鱼吉，利涉大川，利贞。" },
   "001100": { num: 62, name: "小过", title: "雷山小过", judgment: "亨，利贞，可小事，不可大事。" },
-  "010101": { num: 63, name: "既济", title: "水火既济", judgment: "亨，小利贞，初吉终乱。" },
-  "101010": { num: 64, name: "未济", title: "火水未济", judgment: "亨，小狐汔济，濡其尾，无攸利。" },
+  "101010": { num: 63, name: "既济", title: "水火既济", judgment: "亨，小利贞，初吉终乱。" },
+  "010101": { num: 64, name: "未济", title: "火水未济", judgment: "亨，小狐汔济，濡其尾，无攸利。" },
 };
 
 const LINE_LABELS = ["初", "二", "三", "四", "五", "上"];
 
 function castLine() {
-  const sum = [0,1,2].reduce(a => a + (Math.random() < 0.5 ? 2 : 3), 0);
-  return sum;
+  return [0, 1, 2].reduce(a => a + (Math.random() < 0.5 ? 2 : 3), 0);
 }
 
 function lineVal(v) { return (v === 7 || v === 9) ? 1 : 0; }
 
 function getHex(arr) {
-  const key = arr.join("");
-  return HEXAGRAM_DB[key] || { num: "?", name: "？", title: "未知之卦", judgment: "此卦暂未收录。" };
+  return HEXAGRAM_DB[arr.join("")] || { num: "?", name: "？", title: "未知之卦", judgment: "此卦暂未收录。" };
+}
+
+// TRIGRAMS keys are top-to-bottom within each trigram
+function upperTriKey(vals) { return [vals[5], vals[4], vals[3]].join(""); }
+function lowerTriKey(vals) { return [vals[2], vals[1], vals[0]].join(""); }
+
+function buildSummary(question, lines) {
+  const vals    = lines.map(lineVal);
+  const changed = lines.map(v => v === 9 ? 0 : v === 6 ? 1 : lineVal(v));
+  const primary = getHex(vals);
+  const hasChg  = lines.some(v => v === 6 || v === 9);
+  const result  = hasChg ? getHex(changed) : null;
+  const yao     = v => lineVal(v) === 1 ? "━━━━━" : "━━ ━━";
+  const block   = ls => [...ls].reverse().map(v => "  " + yao(v)).join("\n");
+
+  let t = `【易经起卦结果】\n占卜时间：${new Date().toLocaleString("zh-CN")}\n`;
+  if (question) t += `所问之事：${question}\n`;
+  t += `\n本卦：${primary.title}（第${primary.num}卦 · ${primary.name}）\n`;
+  t += block(lines) + `\n卦辞：${primary.judgment}\n`;
+  if (hasChg && result) {
+    const chgs = lines.map((v, i) => (v === 6 || v === 9)
+      ? `  ${LINE_LABELS[i]}爻：${v === 9 ? "老阳○（阳极变阴）" : "老阴✕（阴极变阳）"}` : null).filter(Boolean);
+    t += `\n变爻：\n${chgs.join("\n")}\n`;
+    t += `\n变卦：${result.title}（第${result.num}卦 · ${result.name}）\n`;
+    t += block(changed.map(v => v === 1 ? 7 : 8)) + `\n卦辞：${result.judgment}\n`;
+  }
+  t += `\n---\n请根据以上卦象，结合所问之事给出解读。`;
+  return t;
 }
 
 function LineDraw({ v, idx, showMark, isResult }) {
@@ -101,19 +144,19 @@ function LineDraw({ v, idx, showMark, isResult }) {
     : "none";
 
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:8, justifyContent:"center" }}>
-      <span style={{ fontSize:9, color:"rgba(200,168,75,0.4)", width:14, textAlign:"right" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+      <span style={{ fontSize: 9, color: "rgba(200,168,75,0.4)", width: 14, textAlign: "right" }}>
         {LINE_LABELS[5 - idx]}
       </span>
       {val === 1 ? (
-        <div style={{ width:80, height:8, background:color, boxShadow:glow, borderRadius:1 }} />
+        <div style={{ width: 80, height: 8, background: color, boxShadow: glow, borderRadius: 1 }} />
       ) : (
-        <div style={{ width:80, display:"flex", gap:6 }}>
-          <div style={{ flex:1, height:8, background:color, boxShadow:glow, borderRadius:1 }} />
-          <div style={{ flex:1, height:8, background:color, boxShadow:glow, borderRadius:1 }} />
+        <div style={{ width: 80, display: "flex", gap: 6 }}>
+          <div style={{ flex: 1, height: 8, background: color, boxShadow: glow, borderRadius: 1 }} />
+          <div style={{ flex: 1, height: 8, background: color, boxShadow: glow, borderRadius: 1 }} />
         </div>
       )}
-      <span style={{ width:16, fontSize:12, textAlign:"center", color: v===9?"#e8a04b":"#8ab4d4" }}>
+      <span style={{ width: 16, fontSize: 12, textAlign: "center", color: v === 9 ? "#e8a04b" : "#8ab4d4" }}>
         {showMark && changing ? (v === 9 ? "○" : "✕") : ""}
       </span>
     </div>
@@ -121,39 +164,37 @@ function LineDraw({ v, idx, showMark, isResult }) {
 }
 
 function HexCard({ label, lines, isResult }) {
-  const vals = lines.map(lineVal);
-  const upper = vals.slice(3,6).join("");
-  const lower = vals.slice(0,3).join("");
-  const hex = getHex(vals);
-  const tu = TRIGRAMS[upper] || { name:"", nature:"" };
-  const tl = TRIGRAMS[lower] || { name:"", nature:"" };
+  const vals   = lines.map(lineVal);
+  const hex    = getHex(vals);
+  const tu     = TRIGRAMS[upperTriKey(vals)] || { name: "", nature: "" };
+  const tl     = TRIGRAMS[lowerTriKey(vals)] || { name: "", nature: "" };
   const accent = isResult ? "#8ab4d4" : "#c8a84b";
   const border = isResult ? "rgba(138,180,212,0.25)" : "rgba(200,168,75,0.25)";
 
   return (
-    <div style={{ border:`1px solid ${border}`, background:"rgba(200,168,75,0.03)",
-      padding:"28px 28px 24px", minWidth:200, textAlign:"center" }}>
-      <div style={{ fontSize:10, letterSpacing:5, color:accent, marginBottom:18 }}>{label}</div>
-      <div style={{ fontSize:11, color:"rgba(200,168,75,0.45)", letterSpacing:2, marginBottom:4 }}>
+    <div style={{ border: `1px solid ${border}`, background: "rgba(200,168,75,0.03)",
+      padding: "28px 28px 24px", minWidth: 200, textAlign: "center" }}>
+      <div style={{ fontSize: 10, letterSpacing: 5, color: accent, marginBottom: 18 }}>{label}</div>
+      <div style={{ fontSize: 11, color: "rgba(200,168,75,0.45)", letterSpacing: 2, marginBottom: 4 }}>
         {tu.name} {tu.nature}
       </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:8, margin:"8px 0" }}>
-        {[...lines].reverse().map((v,i) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "8px 0" }}>
+        {[...lines].reverse().map((v, i) => (
           <LineDraw key={i} v={v} idx={i} showMark={!isResult} isResult={isResult} />
         ))}
       </div>
-      <div style={{ fontSize:11, color:"rgba(200,168,75,0.45)", letterSpacing:2, marginTop:4, marginBottom:16 }}>
+      <div style={{ fontSize: 11, color: "rgba(200,168,75,0.45)", letterSpacing: 2, marginTop: 4, marginBottom: 16 }}>
         {tl.name} {tl.nature}
       </div>
-      <div style={{ width:50, height:1, background:border, margin:"0 auto 14px" }} />
-      <div style={{ fontSize:28, fontWeight:700, color:isResult?"#8ab4d4":"#f5e09a", marginBottom:4 }}>
+      <div style={{ width: 50, height: 1, background: border, margin: "0 auto 14px" }} />
+      <div style={{ fontSize: 28, fontWeight: 700, color: isResult ? "#8ab4d4" : "#f5e09a", marginBottom: 4 }}>
         {hex.name}
       </div>
-      <div style={{ fontSize:11, letterSpacing:2, color:"rgba(200,168,75,0.6)", marginBottom:12 }}>
+      <div style={{ fontSize: 11, letterSpacing: 2, color: "rgba(200,168,75,0.6)", marginBottom: 12 }}>
         第{hex.num}卦 · {hex.title}
       </div>
-      <div style={{ fontSize:11, color:"rgba(200,168,75,0.5)", lineHeight:2,
-        borderTop:"1px solid rgba(200,168,75,0.1)", paddingTop:12, maxWidth:180, margin:"0 auto" }}>
+      <div style={{ fontSize: 11, color: "rgba(200,168,75,0.5)", lineHeight: 2,
+        borderTop: "1px solid rgba(200,168,75,0.1)", paddingTop: 12, maxWidth: 180, margin: "0 auto" }}>
         {hex.judgment}
       </div>
     </div>
@@ -161,12 +202,14 @@ function HexCard({ label, lines, isResult }) {
 }
 
 export default function IChing() {
-  const [lines, setLines] = useState(null);
-  const [casting, setCasting] = useState(false);
-  const [step, setStep] = useState(0);
+  const [question, setQuestion] = useState("");
+  const [lines,    setLines]    = useState(null);
+  const [casting,  setCasting]  = useState(false);
+  const [step,     setStep]     = useState(0);
+  const [copied,   setCopied]   = useState(false);
 
   const cast = async () => {
-    setCasting(true); setLines(null); setStep(0);
+    setCasting(true); setLines(null); setStep(0); setCopied(false);
     const r = [];
     for (let i = 0; i < 6; i++) {
       setStep(i + 1);
@@ -177,89 +220,165 @@ export default function IChing() {
     setCasting(false);
   };
 
-  const hasChange = lines?.some(v => v === 6 || v === 9);
-  const changedLines = lines?.map(v => {
-    if (v === 9) return 8;
-    if (v === 6) return 7;
-    return v;
+  const reset = () => { setLines(null); setStep(0); setCopied(false); };
+  const done         = lines?.length === 6 && !casting;
+  const hasChange    = lines?.some(v => v === 6 || v === 9);
+  const changedLines = lines?.map(v => v === 9 ? 8 : v === 6 ? 7 : v);
+  const summary      = done ? buildSummary(question, lines) : "";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(summary).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([summary], { type: "text/plain;charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url;
+    a.download = `卦象_${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const btnStyle = (active) => ({
+    display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
+    background: active ? "rgba(200,168,75,0.18)" : "rgba(200,168,75,0.07)",
+    border: `1px solid ${active ? "rgba(200,168,75,0.6)" : "rgba(200,168,75,0.3)"}`,
+    color: active ? "#f5e09a" : "#d4b86a", padding: "11px 24px",
+    fontSize: 13, letterSpacing: 3, fontFamily: "inherit", transition: "all 0.2s",
   });
 
   return (
-    <div style={{ minHeight:"100vh", background:"#150f05",
-      backgroundImage:"radial-gradient(ellipse at 50% 0%, #261808 0%, #150f05 65%)",
-      display:"flex", flexDirection:"column", alignItems:"center",
-      padding:"48px 20px 60px", fontFamily:"'Noto Serif SC','STSong','SimSun',serif",
-      color:"#e8d5a0" }}>
+    <div style={{ minHeight: "100vh", background: "#150f05",
+      backgroundImage: "radial-gradient(ellipse at 50% 0%, #261808 0%, #150f05 65%)",
+      display: "flex", flexDirection: "column", alignItems: "center",
+      padding: "48px 20px 80px",
+      fontFamily: "'Noto Serif SC','STSong','SimSun',serif", color: "#e8d5a0" }}>
 
       <style>{`
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
-        @keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+        @keyframes fi    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
+        textarea { outline: none; }
+        textarea:focus { border-color: rgba(200,168,75,0.5) !important; }
+        textarea::placeholder { color: rgba(200,168,75,0.3); }
+        .cast-btn:hover   { background: rgba(200,168,75,0.1) !important; box-shadow: 0 0 32px rgba(200,168,75,0.3) !important; }
+        .reset-btn:hover  { color: rgba(200,168,75,0.7) !important; }
+        .action-btn:hover { background: rgba(200,168,75,0.18) !important; }
+        .action-btn:active{ transform: scale(0.97); }
       `}</style>
 
-      <div style={{ textAlign:"center", marginBottom:44 }}>
-        <div style={{ fontSize:10, letterSpacing:8, color:"#c8a84b", opacity:0.6, marginBottom:10 }}>周易占卜</div>
-        <h1 style={{ margin:0, fontSize:36, fontWeight:900, letterSpacing:12,
-          background:"linear-gradient(180deg,#f5e09a 0%,#c8a84b 55%,#9a6828 100%)",
-          WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>易经起卦</h1>
-        <div style={{ width:100, height:1, background:"linear-gradient(90deg,transparent,#c8a84b,transparent)", margin:"14px auto 0" }} />
+      <div style={{ textAlign: "center", marginBottom: 40 }}>
+        <div style={{ fontSize: 10, letterSpacing: 8, color: "#c8a84b", opacity: 0.6, marginBottom: 10 }}>周易占卜</div>
+        <h1 style={{ margin: 0, fontSize: 36, fontWeight: 900, letterSpacing: 12,
+          background: "linear-gradient(180deg,#f5e09a 0%,#c8a84b 55%,#9a6828 100%)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>易经起卦</h1>
+        <div style={{ width: 100, height: 1,
+          background: "linear-gradient(90deg,transparent,#c8a84b,transparent)", margin: "14px auto 0" }} />
       </div>
 
+      {!done && (
+        <div style={{ width: "100%", maxWidth: 480, marginBottom: 32, animation: "fi 0.5s ease" }}>
+          <div style={{ fontSize: 10, letterSpacing: 5, color: "rgba(200,168,75,0.55)", marginBottom: 10 }}>
+            所 问 之 事（可留空）
+          </div>
+          <textarea
+            value={question} onChange={e => setQuestion(e.target.value)}
+            placeholder="在此输入你想占问的事情…" rows={3} disabled={casting}
+            style={{ width: "100%", background: "rgba(200,168,75,0.04)",
+              border: "1px solid rgba(200,168,75,0.2)", color: "#e8d5a0",
+              padding: "12px 16px", fontSize: 14, lineHeight: 1.9,
+              fontFamily: "inherit", resize: "vertical", transition: "border 0.2s" }}
+          />
+        </div>
+      )}
+
+      {done && question && (
+        <div style={{ marginBottom: 28, maxWidth: 520, width: "100%",
+          borderLeft: "2px solid rgba(200,168,75,0.35)", paddingLeft: 16, animation: "fi 0.5s ease" }}>
+          <div style={{ fontSize: 10, letterSpacing: 4, color: "rgba(200,168,75,0.5)", marginBottom: 6 }}>所问之事</div>
+          <div style={{ fontSize: 14, color: "#e8d5a0", lineHeight: 1.9 }}>{question}</div>
+        </div>
+      )}
+
       {!lines && !casting && (
-        <button onClick={cast} style={{
-          background:"none", border:"1px solid #c8a84b", color:"#f5e09a",
-          padding:"14px 44px", fontSize:17, letterSpacing:6,
-          cursor:"pointer", fontFamily:"inherit",
-          boxShadow:"0 0 24px rgba(200,168,75,0.15)", transition:"all 0.2s" }}>
+        <button className="cast-btn" onClick={cast} style={{
+          background: "none", border: "1px solid #c8a84b", color: "#f5e09a",
+          padding: "14px 44px", fontSize: 17, letterSpacing: 6,
+          cursor: "pointer", fontFamily: "inherit",
+          boxShadow: "0 0 24px rgba(200,168,75,0.15)", transition: "all 0.2s" }}>
           ☯ 起 卦
         </button>
       )}
 
       {casting && (
-        <div style={{ color:"#c8a84b", fontSize:13, letterSpacing:4,
-          animation:"pulse 0.8s infinite", marginBottom:16 }}>
+        <div style={{ color: "#c8a84b", fontSize: 13, letterSpacing: 4,
+          animation: "pulse 0.8s infinite", marginBottom: 16 }}>
           正在摇卦… 第 {step} 爻
         </div>
       )}
 
       {lines && lines.length > 0 && (
-        <div style={{ display:"flex", gap:32, flexWrap:"wrap",
-          justifyContent:"center", animation:"fi 0.6s ease" }}>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap",
+          justifyContent: "center", animation: "fi 0.6s ease" }}>
           <HexCard label="本　卦" lines={lines} isResult={false} />
           {hasChange && lines.length === 6 && (
             <>
-              <div style={{ display:"flex", alignItems:"center", fontSize:24, color:"rgba(200,168,75,0.4)" }}>→</div>
+              <div style={{ display: "flex", alignItems: "center", fontSize: 24, color: "rgba(200,168,75,0.4)" }}>→</div>
               <HexCard label="变　卦" lines={changedLines} isResult={true} />
             </>
           )}
         </div>
       )}
 
-      {lines && lines.length === 6 && hasChange && (
-        <div style={{ marginTop:28, maxWidth:420, width:"100%",
-          border:"1px solid rgba(200,168,75,0.15)", padding:"18px 24px",
-          background:"rgba(200,168,75,0.03)", animation:"fi 0.7s ease" }}>
-          <div style={{ fontSize:10, letterSpacing:5, color:"#c8a84b", marginBottom:12 }}>变 爻 详 情</div>
+      {done && hasChange && (
+        <div style={{ marginTop: 24, maxWidth: 420, width: "100%",
+          border: "1px solid rgba(200,168,75,0.15)", padding: "18px 24px",
+          background: "rgba(200,168,75,0.03)", animation: "fi 0.7s ease" }}>
+          <div style={{ fontSize: 10, letterSpacing: 5, color: "#c8a84b", marginBottom: 12 }}>变 爻 详 情</div>
           {lines.map((v, i) => (v !== 6 && v !== 9) ? null : (
-            <div key={i} style={{ display:"flex", gap:12, alignItems:"center", marginBottom:8, fontSize:13 }}>
-              <span style={{ color:"#c8a84b", minWidth:28 }}>{LINE_LABELS[i]}爻</span>
-              <span style={{ fontSize:10, color:v===9?"#e8a04b":"#8ab4d4" }}>
-                {v === 9 ? "老阳 ○" : "老阴 ✕"}
-              </span>
-              <span style={{ fontSize:10, color:"rgba(200,168,75,0.45)" }}>
-                {v === 9 ? "阳极变阴" : "阴极变阳"}
-              </span>
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8, fontSize: 13 }}>
+              <span style={{ color: "#c8a84b", minWidth: 28 }}>{LINE_LABELS[i]}爻</span>
+              <span style={{ fontSize: 10, color: v === 9 ? "#e8a04b" : "#8ab4d4" }}>{v === 9 ? "老阳 ○" : "老阴 ✕"}</span>
+              <span style={{ fontSize: 10, color: "rgba(200,168,75,0.45)" }}>{v === 9 ? "阳极变阴" : "阴极变阳"}</span>
             </div>
           ))}
         </div>
       )}
 
-      {lines && lines.length === 6 && !casting && (
-        <button onClick={() => { setLines(null); setStep(0); }} style={{
-          marginTop:28, background:"none", border:"none",
-          color:"rgba(200,168,75,0.4)", fontSize:11, letterSpacing:5,
-          cursor:"pointer", fontFamily:"inherit" }}>
-          重 新 起 卦
-        </button>
+      {done && (
+        <div style={{ marginTop: 32, display: "flex", flexDirection: "column",
+          alignItems: "center", gap: 16, animation: "fi 0.8s ease", width: "100%", maxWidth: 520 }}>
+          <div style={{ fontSize: 11, color: "rgba(200,168,75,0.4)", letterSpacing: 3 }}>
+            ── 复制或导出，粘贴给 AI 解读 ──
+          </div>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+            <button className="action-btn" onClick={handleCopy} style={btnStyle(copied)}>
+              <span style={{ fontSize: 15 }}>{copied ? "✓" : "⎘"}</span>
+              <span style={{ minWidth: 64 }}>{copied ? "已复制！" : "复制卦象"}</span>
+            </button>
+            <button className="action-btn" onClick={handleExport} style={btnStyle(false)}>
+              <span style={{ fontSize: 15 }}>↓</span>
+              <span>导出 .txt</span>
+            </button>
+          </div>
+          <div style={{ width: "100%", background: "rgba(0,0,0,0.35)",
+            border: "1px solid rgba(200,168,75,0.1)", padding: "14px 18px" }}>
+            <div style={{ fontSize: 9, letterSpacing: 4, color: "rgba(200,168,75,0.3)", marginBottom: 10 }}>预 览</div>
+            <pre style={{ fontSize: 11, color: "rgba(200,168,75,0.55)", lineHeight: 2,
+              whiteSpace: "pre-wrap", wordBreak: "break-all", fontFamily: "inherit", margin: 0 }}>
+              {summary}
+            </pre>
+          </div>
+          <button className="reset-btn" onClick={reset} style={{
+            marginTop: 4, background: "none", border: "none",
+            color: "rgba(200,168,75,0.35)", fontSize: 11, letterSpacing: 5,
+            cursor: "pointer", fontFamily: "inherit", transition: "color 0.2s" }}>
+            重 新 起 卦
+          </button>
+        </div>
       )}
     </div>
   );
