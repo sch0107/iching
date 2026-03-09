@@ -16,8 +16,13 @@ function getHourBranch(hour) {
   return hour === 23 ? 1 : Math.floor(hour / 2) + 1;
 }
 
-function calculate() {
-  const now    = new Date();
+function calculate(useUtc8) {
+  let now = new Date();
+  if (useUtc8) {
+    const utc8Offset  = 8 * 60;
+    const localOffset = now.getTimezoneOffset();
+    now = new Date(now.getTime() + (utc8Offset + localOffset) * 60000);
+  }
   const month  = now.getMonth() + 1;
   const day    = now.getDate();
   const branch = getHourBranch(now.getHours());
@@ -33,12 +38,13 @@ export default function XiaoLiuRen() {
   const [reading,  setReading]  = useState(null);
   const [copied,   setCopied]   = useState(false);
   const [divining, setDivining] = useState(false);
+  const [useUtc8,  setUseUtc8]  = useState(true);
 
   const divine = () => {
     setDivining(true);
     setCopied(false);
     setTimeout(() => {
-      setReading(calculate());
+      setReading(calculate(useUtc8));
       setDivining(false);
     }, 800);
   };
@@ -65,6 +71,14 @@ export default function XiaoLiuRen() {
       setCopied(true); setTimeout(() => setCopied(false), 2500);
     });
   };
+
+  const tzBtnStyle = (active) => ({
+    cursor:"pointer", padding:"3px 10px", fontSize:10, letterSpacing:1,
+    fontFamily:"inherit", transition:"all 0.2s",
+    background: active ? "rgba(200,168,75,0.18)" : "none",
+    border: `1px solid ${active ? "rgba(200,168,75,0.5)" : "rgba(200,168,75,0.2)"}`,
+    color: active ? "#f5e09a" : "rgba(200,168,75,0.45)",
+  });
 
   const btnStyle = (active) => ({
     display:"flex", alignItems:"center", gap:8, cursor:"pointer",
@@ -94,6 +108,20 @@ export default function XiaoLiuRen() {
         <div style={{width:80, height:1,
           background:"linear-gradient(90deg,transparent,#c8a84b,transparent)", margin:"12px auto 0"}}/>
       </div>
+
+      {/* Timezone selector */}
+      {!done && (
+        <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:24,
+          fontSize:10, color:"rgba(200,168,75,0.5)", letterSpacing:2}}>
+          <span>{t("xlr.tzLabel")}：</span>
+          <button style={tzBtnStyle(useUtc8)}  onClick={() => setUseUtc8(true)}>
+            {t("xlr.tzUtc8")}
+          </button>
+          <button style={tzBtnStyle(!useUtc8)} onClick={() => setUseUtc8(false)}>
+            {t("xlr.tzLocal")}
+          </button>
+        </div>
+      )}
 
       {/* Question input */}
       {!done && (
