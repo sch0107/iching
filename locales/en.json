@@ -59,7 +59,8 @@
     "iching": "I Ching",
     "coin":   "Coin",
     "xlr":    "Six Signs",
-    "mhy":    "Plum Oracle"
+    "mhy":    "Plum Oracle",
+    "tarot":  "Tarot"
   },
   "coin": {
     "subtitle":        "Coin Oracle",
