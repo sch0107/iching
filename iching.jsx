@@ -194,8 +194,6 @@ function HexCard({ label, lines, isResult }) {
   );
 }
 
-const LANGS = ["zh-Hans","zh-Hant","en"];
-
 export default function IChing() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -246,52 +244,8 @@ export default function IChing() {
   });
 
   return (
-    <div style={{minHeight:"100vh",background:"#150f05",
-      backgroundImage:"radial-gradient(ellipse at 50% 0%, #261808 0%, #150f05 65%)",
-      display:"flex",flexDirection:"column",alignItems:"center",
-      padding:"48px 20px 80px",
-      fontFamily:"'Noto Serif SC','STSong','SimSun',serif",color:"#e8d5a0"}}>
-
-      <style>{`
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.25}}
-        @keyframes fi{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-        textarea{outline:none}
-        textarea:focus{border-color:rgba(200,168,75,0.5)!important}
-        textarea::placeholder{color:rgba(200,168,75,0.3)}
-        .cast-btn:hover{background:rgba(200,168,75,0.1)!important;box-shadow:0 0 32px rgba(200,168,75,0.3)!important}
-        .reset-btn:hover{color:rgba(200,168,75,0.7)!important}
-        .action-btn:hover{background:rgba(200,168,75,0.18)!important}
-        .action-btn:active{transform:scale(0.97)}
-        .lang-btn:hover{color:rgba(200,168,75,0.8)!important;border-color:rgba(200,168,75,0.4)!important}
-        /* ── Mobile layout ── */
-        @media (max-width:600px){
-          .hex-row{flex-direction:column!important;align-items:center}
-          .hex-arrow{transform:rotate(90deg)}
-          .hex-card{min-width:unset!important;width:100%;max-width:320px}
-          .lang-switcher{top:10px!important;right:10px!important;gap:4px!important}
-          .lang-btn{padding:4px 7px!important;font-size:10px!important}
-          .cast-btn{padding:12px 32px!important;font-size:15px!important}
-        }
-      `}</style>
-
-      {/* Language switcher */}
-      <div className="lang-switcher"
-        style={{position:"fixed",top:16,right:20,display:"flex",gap:6,zIndex:100}}>
-        {LANGS.map(l => (
-          <button key={l} className="lang-btn"
-            onClick={() => i18n.changeLanguage(l)}
-            style={{
-              background:lang===l?"rgba(200,168,75,0.15)":"none",
-              border:`1px solid ${lang===l?"rgba(200,168,75,0.5)":"rgba(200,168,75,0.2)"}`,
-              color:lang===l?"#f5e09a":"rgba(200,168,75,0.5)",
-              padding:"5px 10px",fontSize:11,cursor:"pointer",
-              fontFamily:"inherit",transition:"all 0.2s",letterSpacing:1,
-            }}>
-            {/* Each locale file provides its own short label */}
-            {l==="zh-Hans"?"简":l==="zh-Hant"?"繁":"EN"}
-          </button>
-        ))}
-      </div>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",
+      padding:"40px 20px 80px", minHeight:"calc(100vh - 48px)"}}>
 
       {/* Title */}
       <div style={{textAlign:"center",marginBottom:40}}>
