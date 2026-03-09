@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import i18n from "./i18n.js";
+import i18n from "../i18n.js";
 
 export default function CoinToss() {
   const { t }  = useTranslation();

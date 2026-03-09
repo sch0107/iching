@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "./i18n.js";
-import IChing from "./iching.jsx";
-import CoinToss from "./CoinToss.jsx";
-import XiaoLiuRen from "./XiaoLiuRen.jsx";
-import MeiHua from "./MeiHua.jsx";
-import Tarot from "./Tarot.jsx";
+import IChing from "./modes/IChing.jsx";
+import CoinToss from "./modes/CoinToss.jsx";
+import XiaoLiuRen from "./modes/XiaoLiuRen.jsx";
+import MeiHua from "./modes/MeiHua.jsx";
+import Tarot from "./modes/Tarot.jsx";
 
 const LANGS = [
   { code: "zh-Hans", label: "简" },
