@@ -1,96 +1,104 @@
-# 易经起卦 · I Ching Oracle
+# 易经起卦 · 中国传统占卜
 
-A traditional Chinese divination web app with four modes, built with React + Vite. Hosted on GitHub Pages.
+基于 React + Vite 构建的中国传统占卜网页应用，支持四种占卜方式。托管于 GitHub Pages。
 
-**[Live site →](https://sch0107.github.io/iching/)**
+**[在线体验 →](https://sch0107.github.io/iching/)**
 
 ---
 
-## Features
+## 功能概览
 
-### Four Divination Modes
+### 四种占卜模式
 
-| Mode | 中文 | Description |
-|------|------|-------------|
-| **I Ching** | 易经 | Full 64-hexagram reading with changing lines and derived hexagram |
-| **Coin** | 铜钱/銅錢 | Single coin toss for quick yes/no guidance |
-| **Six Signs** | 小六壬 | Classical six-sign oracle calculated from the current time |
-| **Plum Blossom** | 梅花易術 | 邵雍's time-based numerology: Earlier Heaven trigram numbers → hexagram + moving line + derived hexagram |
+| 模式 | 简介 |
+|------|------|
+| **易经** | 完整六十四卦起卦，含变爻与变卦 |
+| **铜钱** | 单枚铜钱投掷，快速问是非 |
+| **小六壬** | 依当前时间推算六神课 |
+| **梅花易术** | 邵雍时间起卦法，起本卦、动爻、变卦 |
 
-### Multilingual
-- Simplified Chinese (简体中文)
-- Traditional Chinese (繁體中文)
+### 多语言支持
+- 简体中文
+- 繁體中文
 - English
 
-All text — including all 64 hexagram names, judgments, trigram names, and sign descriptions — lives in the three locale JSON files. No translatable strings are hardcoded in components.
+所有文字（包括六十四卦卦名、卦辞、八卦名、六壬神名）均存于三份语言文件中，组件内无硬编码译文。
 
-### Timezone Selector (小六壬 & 梅花易術)
-- **UTC+8** (default) — uses Chinese standard time for the hour-branch calculation, giving traditionally correct results regardless of where you are
-- **Local** — uses the device's local timezone
+### 时区选择（小六壬 & 梅花易术）
+- **UTC+8**（默认）：以北京时间计算时辰，传统方法推荐
+- **本地**：使用设备本地时区
 
-### Other
-- Copy reading to clipboard — paste directly into an AI for interpretation
-- Export as `.txt` (I Ching)
-- Responsive mobile layout
-- Internationalization via [react-i18next](https://react.i18next.com/)
-
----
-
-## Divination Methods
-
-### 梅花易術 (Plum Blossom Oracle)
-Time-based divination (时间起卦) attributed to Shao Yong (邵雍), using Earlier Heaven (先天八卦) numerology:
-
-| Step | Formula |
-|------|---------|
-| Year number | `year % 100` |
-| Upper trigram | `(year + month + day) % 8` → 1=乾 … 8=坤 |
-| Lower trigram | `(year + month + day + hour-branch) % 8` |
-| Moving line | `(year + month + day + hour-branch) % 6` (0 → 6) |
-
-The primary hexagram is formed from the two trigrams; the moving line is applied to produce the derived hexagram. Body (体卦) and Use (用卦) trigrams are identified based on which trigram contains the moving line.
+### 其他
+- 一键复制占卜结果，可直接粘贴给 AI 解读
+- 导出 `.txt` 文件（易经）
+- 适配移动端布局
 
 ---
 
-## Tech Stack
+## 占卜方法简介
+
+### 易经（周易起卦）
+周易是中国最古老的占卜典籍，通过摇卦得到由六条爻组成的卦象（共六十四卦）。本应用模拟"蓍草法"概率，每爻以四营十八变确定阴阳，并区分老阴、老阳（变爻）。若有变爻，则额外生成变卦，两卦合参以判断事物的当下状态与走向。
+
+### 铜钱（一枚铜钱）
+以单枚铜钱正反面代表阴阳，简洁直接地回答是非问题。正面为阳，主吉，事可行；反面为阴，主否，宜缓行。适合需要快速决断的场合。
+
+### 小六壬
+小六壬是民间流传的简易时间占卜术，以月、日、时三数依次推算，落于大安、留连、速喜、赤口、小吉、空亡六神之一。六神各有吉凶含义，可判断当前事宜的顺逆。起课方法：以月数为起点，加日数后再加时支数，除以六取余，对应所得神课。
+
+### 梅花易术（时间起卦）
+梅花易术为宋代邵雍所创，以先天八卦数配合时间推算卦象，无需蓍草或铜钱。起卦步骤如下：
+
+| 步骤 | 公式 |
+|------|------|
+| 年数 | 当前年份末两位 |
+| 上卦 | （年 + 月 + 日）÷ 8 取余，0 作 8 |
+| 下卦 | （年 + 月 + 日 + 时支）÷ 8 取余，0 作 8 |
+| 动爻 | （年 + 月 + 日 + 时支）÷ 6 取余，0 作 6 |
+
+先天八卦数：1=乾，2=兑，3=离，4=震，5=巽，6=坎，7=艮，8=坤。上下卦合成本卦，动爻变爻后得变卦，并据动爻位置判断体卦（不动者）与用卦（含动爻者），以体用关系论吉凶。
+
+---
+
+## 技术栈
 
 - [React 18](https://react.dev/)
 - [Vite](https://vitejs.dev/)
-- [react-i18next](https://react.i18next.com/) — i18n
-- GitHub Actions — CI/CD build & deploy
-- GitHub Pages — hosting
+- [react-i18next](https://react.i18next.com/) — 国际化
+- GitHub Actions — 自动构建与部署
+- GitHub Pages — 托管
 
 ---
 
-## Project Structure
+## 项目结构
 
 ```
-├── App.jsx              # Root: nav bar, mode routing, lang switcher
-├── iching.jsx           # I Ching full reading
-├── CoinToss.jsx         # Coin toss oracle
-├── XiaoLiuRen.jsx       # 小六壬 six-sign oracle (with timezone selector)
-├── MeiHua.jsx           # 梅花易術 plum blossom oracle (with timezone selector)
-├── i18n.js              # i18next config
+├── App.jsx              # 根组件：导航栏、模式路由、语言切换
+├── iching.jsx           # 易经起卦
+├── CoinToss.jsx         # 铜钱占卜
+├── XiaoLiuRen.jsx       # 小六壬（含时区选择）
+├── MeiHua.jsx           # 梅花易术（含时区选择）
+├── i18n.js              # i18next 配置
 ├── locales/
-│   ├── en.json          # All UI strings + 64 hexagrams + trigrams + signs (EN)
-│   ├── zh-Hans.json     # Same, Simplified Chinese
-│   └── zh-Hant.json     # Same, Traditional Chinese
-├── main.jsx             # React entry point
-├── index.html           # Vite template
+│   ├── en.json          # 英文：界面文字 + 六十四卦 + 八卦 + 六壬神
+│   ├── zh-Hans.json     # 简体中文
+│   └── zh-Hant.json     # 繁體中文
+├── main.jsx             # React 入口
+├── index.html           # Vite 模板
 └── vite.config.js       # base: "/iching/"
 ```
 
 ---
 
-## Local Development
+## 本地开发
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Deploy
+## 部署
 
-Push to `main` — GitHub Actions builds and deploys automatically.
+推送到 `main` 分支后，GitHub Actions 自动构建并部署至 GitHub Pages。
 
-The workflow requires **Settings → Pages → Source → GitHub Actions** to be enabled in the repo.
+需在仓库设置中启用：**Settings → Pages → Source → GitHub Actions**
