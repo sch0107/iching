@@ -81,7 +81,7 @@ function CardDisplay({ card, position, t }) {
 
 export default function Tarot() {
   const { t } = useTranslation();
-  const [spread,      setSpread]      = useState("single"); // "single" | "three"
+  const [spread,      setSpread]      = useState("single"); // "single" | "three" | "five" | "celtic"
   const [allowRev,    setAllowRev]    = useState(false);
   const [question,    setQuestion]    = useState("");
   const [cards,       setCards]       = useState(null);
@@ -93,7 +93,8 @@ export default function Tarot() {
     setDrawing(true);
     setCards(null);
     setTimeout(() => {
-      const count = spread === "three" ? 3 : 1;
+      const counts = { single: 1, three: 3, five: 5, celtic: 10 };
+      const count = counts[spread] || 1;
       setCards(drawCards(count, allowRev, funMode));
       setDrawing(false);
     }, 600);
@@ -109,11 +110,27 @@ export default function Tarot() {
     const lines = [t("tarot.summaryHeader")];
     lines.push(t("tarot.summaryTime") + new Date().toLocaleString());
     if (question) lines.push(t("tarot.summaryQ") + question);
-    lines.push(t("tarot.summarySpread") + t(`tarot.spread${spread === "three" ? "Three" : "Single"}`));
+    const spreadNames = { single: "Single", three: "Three", five: "Five", celtic: "Celtic" };
+    lines.push(t("tarot.summarySpread") + t(`tarot.spread${spreadNames[spread]}`));
     lines.push("");
-    const positions = spread === "three"
-      ? [t("tarot.posPast"), t("tarot.posPresent"), t("tarot.posFuture")]
-      : [t("tarot.posSingle")];
+    let positions;
+    if (spread === "five") {
+      positions = [t("tarot.posPast"), t("tarot.posPresent"), t("tarot.posFuture"), t("tarot.posHidden"), t("tarot.posAdvice")];
+    } else if (spread === "celtic") {
+      positions = [
+        t("tarot.posSituation"), t("tarot.posAction"),
+        t("tarot.posOutcome"),
+        t("tarot.posPast"), t("tarot.posPresent"),
+        t("tarot.posFuture"),
+        t("tarot.posHidden"), t("tarot.posAdvice"),
+        t("tarot.posOutcome"), t("tarot.posOutcome"),
+        t("tarot.posOutcome")
+      ];
+    } else {
+      positions = spread === "three"
+        ? [t("tarot.posPast"), t("tarot.posPresent"), t("tarot.posFuture")]
+        : [t("tarot.posSingle")];
+    }
     cards.forEach((card, i) => {
       lines.push(t("tarot.summaryPos") + positions[i]);
       lines.push(t("tarot.summaryCard") + t(`tarot.cards.${card.id}.name`));
@@ -159,18 +176,21 @@ export default function Tarot() {
             <div style={{ fontSize: 11, letterSpacing: 3, color: GOLD + "0.5)", marginBottom: 8 }}>
               {t("tarot.spreadLabel")}
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              {["single", "three"].map(s => (
-                <button key={s} onClick={() => setSpread(s)} style={{
-                  background: spread === s ? GOLD + "0.15)" : "none",
-                  border: `1px solid ${spread === s ? GOLD + "0.5)" : GOLD + "0.2)"}`,
-                  color: spread === s ? "#f5e09a" : GOLD + "0.5)",
-                  padding: "6px 18px", fontSize: 12, letterSpacing: 2,
-                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
-                }}>
-                  {t(`tarot.spread${s === "three" ? "Three" : "Single"}`)}
-                </button>
-              ))}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {["single", "three", "five", "celtic"].map(s => {
+                const label = s === "three" ? "Three" : s === "five" ? "Five" : s === "celtic" ? "Celtic" : "Single";
+                return (
+                  <button key={s} onClick={() => setSpread(s)} style={{
+                    background: spread === s ? GOLD + "0.15)" : "none",
+                    border: `1px solid ${spread === s ? GOLD + "0.5)" : GOLD + "0.2)"}`,
+                    color: spread === s ? "#f5e09a" : GOLD + "0.5)",
+                    padding: "6px 12px", fontSize: 12, letterSpacing: 2,
+                    cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+                  }}>
+                    {t(`tarot.spread${label}`)}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -268,9 +288,29 @@ export default function Tarot() {
             display: "flex", gap: 16, justifyContent: "center",
             flexWrap: "wrap", marginBottom: 28,
           }}>
-            {cards.map((card, i) => (
-              <CardDisplay key={card.id} card={card} position={positions[i]} t={t} />
-            ))}
+            {cards.map((card, i) => {
+              let position;
+              if (spread === "five") {
+                const posLabels = [t("tarot.posPast"), t("tarot.posPresent"), t("tarot.posFuture"), t("tarot.posHidden"), t("tarot.posAdvice")];
+                position = posLabels[i];
+              } else if (spread === "celtic") {
+                const posLabels = [
+                  t("tarot.posSituation"), t("tarot.posAction"),
+                  t("tarot.posOutcome"),
+                  t("tarot.posPast"), t("tarot.posPresent"),
+                  t("tarot.posFuture"),
+                  t("tarot.posHidden"), t("tarot.posAdvice"),
+                  t("tarot.posOutcome"), t("tarot.posOutcome"),
+                  t("tarot.posOutcome")
+                ];
+                position = posLabels[i];
+              } else {
+                position = spread === "three"
+                  ? [t("tarot.posPast"), t("tarot.posPresent"), t("tarot.posFuture")][i]
+                  : t("tarot.posSingle");
+              }
+              return <CardDisplay key={card.id} card={card} position={position} t={t} />;
+            })}
           </div>
 
           {/* Action buttons */}

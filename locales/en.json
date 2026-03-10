@@ -66,7 +66,8 @@
     "coin":   "Coin",
     "xlr":    "Six Signs",
     "mhy":    "Plum Oracle",
-    "tarot":  "Tarot"
+    "tarot":  "Tarot",
+    "d6":     "Da Liu Ren"
   },
   "coin": {
     "subtitle":        "Coin Oracle",
@@ -171,6 +172,27 @@
     "summaryLine":     "Moving line: ",
     "summaryHex":      "Hexagram: ",
     "summaryDerived":  "Derived: ",
+    "footer":          "Please interpret this reading in light of your question."
+  },
+  "d6": {
+    "subtitle":        "Da Liu Ren Divination",
+    "title":           "Da Liu Ren",
+    "method":          "Birth Pillars Divination",
+    "birthLabel":      "Birth Date & Time (八字符)",
+    "birthPlaceholder": "Enter your birth date and time…",
+    "yearLabel":       "Year",
+    "monthLabel":      "Month",
+    "dayLabel":        "Day",
+    "hourLabel":       "Hour",
+    "button":          "✦ Divine",
+    "divining":        "Divining…",
+    "resultSign":      "Result Sign",
+    "resultMeaning":   "Meaning",
+    "summaryHeader":   "[Da Liu Ren Reading]",
+    "summaryTime":     "Date: ",
+    "summaryQ":        "Question: ",
+    "summaryPillars":  "Birth Pillars: ",
+    "summarySign":     "Sign: ",
     "footer":          "Please interpret this reading in light of your question."
   },
   "branches": {

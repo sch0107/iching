@@ -6,13 +6,14 @@ import CoinToss from "./modes/CoinToss.jsx";
 import XiaoLiuRen from "./modes/XiaoLiuRen.jsx";
 import MeiHua from "./modes/MeiHua.jsx";
 import Tarot from "./modes/Tarot.jsx";
+import Da6 from "./modes/Da6.jsx";
 
 const LANGS = [
   { code: "zh-Hans", label: "简" },
   { code: "zh-Hant", label: "繁" },
   { code: "en",      label: "EN" },
 ];
-const MODES = ["iching", "coin", "xlr", "mhy", "tarot"];
+const MODES = ["iching", "coin", "xlr", "mhy", "d6", "tarot"];
 
 export default function App() {
   const { t } = useTranslation();
@@ -105,6 +106,7 @@ export default function App() {
         {mode === "coin"   && <CoinToss />}
         {mode === "xlr"    && <XiaoLiuRen />}
         {mode === "mhy"    && <MeiHua />}
+        {mode === "d6"     && <Da6 />}
         {mode === "tarot"  && <Tarot />}
       </div>
     </div>
