@@ -11,10 +11,11 @@ export default function CoinToss() {
   const [isFlipping,setIsFlipping]= useState(false);
   const [flipKey,   setFlipKey]   = useState(0);
   const [copied,    setCopied]    = useState(false);
+  const [funMode,   setFunMode]   = useState(false);
 
   const toss = () => {
     if (isFlipping) return;
-    const r = Math.random() < 0.5 ? "yang" : "yin";
+    const r = funMode ? "yang" : (Math.random() < 0.5 ? "yang" : "yin");
     setResult(r);
     setFlipKey(k => k + 1);
     setIsFlipping(true);
@@ -85,6 +86,26 @@ export default function CoinToss() {
         <div style={{width:80, height:1,
           background:"linear-gradient(90deg,transparent,#c8a84b,transparent)", margin:"12px auto 0"}}/>
       </div>
+
+      {/* Fun mode toggle */}
+      {!done && (
+        <div style={{marginBottom:16,animation:"fi 0.5s ease"}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
+              {t("funMode.label")}
+            </span>
+            <button onClick={()=>setFunMode(!funMode)} style={{
+              background:funMode?"rgba(200,168,75,0.2)":"none",
+              border:"1px solid rgba(200,168,75,0.3)",
+              color:funMode?"#f5e09a":"rgba(200,168,75,0.5)",
+              padding:"6px 16px",fontSize:11,letterSpacing:2,
+              cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
+            }}>
+              {funMode?t("funMode.on"):t("funMode.off")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Question input */}
       {!done && (

@@ -44,6 +44,12 @@
   "summaryReversed":"逆位",
   "summaryMeaning": "解说：",
   "footer": "请结合所问之事解读此次占卜。",
+  "funMode": {
+    "label": "手气不错",
+    "hint": "",
+    "on": "开启",
+    "off": "关闭"
+  },
   "cards": {
     "0":  {"name":"愚者",       "uprightKw":"新开始·天真·自由",         "reversedKw":"鲁莽·轻率·冒险",             "upright":"全新的旅程在眼前展开，放下顾虑，以开放的心态迈向未知。",             "reversed":"冲动与轻率可能将你引入歧途，行动之前请三思而后行。"},
     "1":  {"name":"魔法师",     "uprightKw":"意志·技艺·实现",           "reversedKw":"操控·浪费才能·欺骗",         "upright":"你拥有成事所需的一切资源，专注意志与行动，理想可以化为现实。",       "reversed":"才能被浪费或用于操控他人，请检视自己的动机与方向。"},

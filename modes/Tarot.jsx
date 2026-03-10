@@ -4,8 +4,12 @@ import { TAROT_CARDS, shuffle } from "./tarotData.js";
 
 const GOLD = "rgba(200,168,75,";
 
-function drawCards(count, allowReversed) {
-  return shuffle(TAROT_CARDS).slice(0, count).map(card => ({
+// Good cards for fun mode (mostly positive meanings)
+const GOOD_CARDS = [0, 1, 3, 4, 5, 6, 7, 8, 10, 11, 14, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 33, 34, 35, 36, 37, 38, 39, 44, 46, 49, 50, 52, 54, 58, 59, 62, 63, 64, 68, 69, 72, 73, 74, 75, 76, 77];
+
+function drawCards(count, allowReversed, funMode) {
+  const pool = funMode ? GOOD_CARDS.map(id => TAROT_CARDS.find(c => c.id === id)).filter(Boolean) : TAROT_CARDS;
+  return shuffle(pool).slice(0, count).map(card => ({
     ...card,
     reversed: allowReversed && Math.random() < 0.5,
   }));
@@ -83,13 +87,14 @@ export default function Tarot() {
   const [cards,       setCards]       = useState(null);
   const [drawing,     setDrawing]     = useState(false);
   const [copied,      setCopied]      = useState(false);
+  const [funMode,     setFunMode]     = useState(false);
 
   function handleDraw() {
     setDrawing(true);
     setCards(null);
     setTimeout(() => {
       const count = spread === "three" ? 3 : 1;
-      setCards(drawCards(count, allowRev));
+      setCards(drawCards(count, allowRev, funMode));
       setDrawing(false);
     }, 600);
   }
@@ -187,6 +192,22 @@ export default function Tarot() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Fun mode toggle */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+            <span style={{ fontSize: 11, letterSpacing: 2, color: GOLD + "0.6)" }}>
+              {t("tarot.funMode.label")}
+            </span>
+            <button onClick={() => setFunMode(!funMode)} style={{
+              background: funMode ? GOLD + "0.15)" : "none",
+              border: `1px solid ${funMode ? GOLD + "0.5)" : GOLD + "0.2)"}`,
+              color: funMode ? "#f5e09a" : GOLD + "0.5)",
+              padding: "6px 18px", fontSize: 12, letterSpacing: 2,
+              cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+            }}>
+              {funMode ? t("tarot.funMode.on") : t("tarot.funMode.off")}
+            </button>
           </div>
 
           {/* Question input */}

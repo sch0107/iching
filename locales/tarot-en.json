@@ -44,6 +44,12 @@
   "summaryReversed":"Reversed",
   "summaryMeaning": "Meaning: ",
   "footer": "Please interpret this reading in light of your question.",
+  "funMode": {
+    "label": "I'm feeling lucky",
+    "hint": "",
+    "on": "On",
+    "off": "Off"
+  },
   "cards": {
     "0":  {"name":"The Fool",           "uprightKw":"New beginnings · Innocence · Spontaneity",  "reversedKw":"Recklessness · Naivety · Folly",              "upright":"A fresh start beckons; embrace the unknown with an open heart and trust the journey.",                       "reversed":"Reckless choices and poor judgment may lead you astray — pause and consider the risks before leaping."},
     "1":  {"name":"The Magician",       "uprightKw":"Willpower · Skill · Manifestation",         "reversedKw":"Manipulation · Wasted talent · Trickery",      "upright":"You have all the tools you need; focused will and skillful action can turn your vision into reality.",       "reversed":"Talents go unused or are turned toward manipulation — realign your intentions with integrity."},

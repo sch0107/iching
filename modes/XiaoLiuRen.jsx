@@ -16,7 +16,7 @@ function getHourBranch(hour) {
   return hour === 23 ? 1 : Math.floor(hour / 2) + 1;
 }
 
-function calculate(useUtc8) {
+function calculate(useUtc8, funMode) {
   let now = new Date();
   if (useUtc8) {
     const utc8Offset  = 8 * 60;
@@ -26,7 +26,9 @@ function calculate(useUtc8) {
   const month  = now.getMonth() + 1;
   const day    = now.getDate();
   const branch = getHourBranch(now.getHours());
-  const index  = ((month - 1) + (day - 1) + (branch - 1)) % 6;
+  const index  = funMode
+    ? [0, 2, 4][Math.floor(Math.random() * 3)] // 大安, 速喜, 小吉
+    : ((month - 1) + (day - 1) + (branch - 1)) % 6;
   return { month, day, branch, index };
 }
 
@@ -39,12 +41,13 @@ export default function XiaoLiuRen() {
   const [copied,   setCopied]   = useState(false);
   const [divining, setDivining] = useState(false);
   const [useUtc8,  setUseUtc8]  = useState(true);
+  const [funMode,  setFunMode]  = useState(false);
 
   const divine = () => {
     setDivining(true);
     setCopied(false);
     setTimeout(() => {
-      setReading(calculate(useUtc8));
+      setReading(calculate(useUtc8, funMode));
       setDivining(false);
     }, 800);
   };
@@ -120,6 +123,26 @@ export default function XiaoLiuRen() {
           <button style={tzBtnStyle(!useUtc8)} onClick={() => setUseUtc8(false)}>
             {t("xlr.tzLocal")}
           </button>
+        </div>
+      )}
+
+      {/* Fun mode toggle */}
+      {!done && (
+        <div style={{marginBottom:16,animation:"fi 0.5s ease"}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
+              {t("funMode.label")}
+            </span>
+            <button onClick={()=>setFunMode(!funMode)} style={{
+              background:funMode?"rgba(200,168,75,0.2)":"none",
+              border:"1px solid rgba(200,168,75,0.3)",
+              color:funMode?"#f5e09a":"rgba(200,168,75,0.5)",
+              padding:"6px 16px",fontSize:11,letterSpacing:2,
+              cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
+            }}>
+              {funMode?t("funMode.on"):t("funMode.off")}
+            </button>
+          </div>
         </div>
       )}
 

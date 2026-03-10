@@ -42,7 +42,15 @@ function getHexKey(arr) {
   return HEXAGRAM_DB[key] ? key : "unknown";
 }
 
-function calculate(useUtc8) {
+// Good hexagrams for fun mode (favorable outcomes)
+const GOOD_HEXAGRAMS = [1, 11, 14, 43, 52, 58, 11, 42, 5, 8, 10, 25, 17, 3, 44, 22];
+
+function drawFunModeHex() {
+  const targetNum = GOOD_HEXAGRAMS[Math.floor(Math.random() * GOOD_HEXAGRAMS.length)];
+  return Object.keys(HEXAGRAM_DB).find(k => HEXAGRAM_DB[k] === targetNum) || "111111";
+}
+
+function calculate(useUtc8, funMode) {
   let now = new Date();
   if (useUtc8) {
     const utc8Offset  = 8 * 60;
@@ -61,28 +69,48 @@ function calculate(useUtc8) {
   const upperTriKey = EARLIER_HEAVEN[upperNum];
   const lowerTriKey = EARLIER_HEAVEN[lowerNum];
 
-  // Hexagram key: lower lines 0-2 then upper lines 3-5 (each reversed from trigram key)
-  const hexArr = triToHexPart(lowerTriKey).split("").map(Number)
-    .concat(triToHexPart(upperTriKey).split("").map(Number));
-  const hexKey = getHexKey(hexArr);
+  let hexArr, hexKey, derivedArr, derivedKey, bodyTriKey, useTriKey, lineNumForDisplay;
 
-  // Derived hexagram: flip the moving line (lineNum is 1-based, index 0-based)
-  const derivedArr = [...hexArr];
-  derivedArr[lineNum - 1] = 1 - derivedArr[lineNum - 1];
-  const derivedKey = getHexKey(derivedArr);
+  if (funMode) {
+    // Use pre-selected good hexagram
+    const goodHexKey = drawFunModeHex();
+    hexArr = goodHexKey.split("").map(Number);
+    hexKey = goodHexKey;
+    // Still compute derived by flipping a random line
+    lineNumForDisplay = Math.floor(Math.random() * 6) + 1;
+    derivedArr = [...hexArr];
+    derivedArr[lineNumForDisplay - 1] = 1 - derivedArr[lineNumForDisplay - 1];
+    derivedKey = getHexKey(derivedArr);
+    // For fun mode, determine body/use based on line position
+    bodyTriKey = lineNumForDisplay <= 3 ? upperTriKey : lowerTriKey;
+    useTriKey = lineNumForDisplay <= 3 ? lowerTriKey : upperTriKey;
+  } else {
+    // Normal calculation
+    lineNumForDisplay = lineNum;
+    // Hexagram key: lower lines 0-2 then upper lines 3-5 (each reversed from trigram key)
+    hexArr = triToHexPart(lowerTriKey).split("").map(Number)
+      .concat(triToHexPart(upperTriKey).split("").map(Number));
+    hexKey = getHexKey(hexArr);
 
-  // Body (体) and Use (用) trigrams
-  // Moving line in lower (1-3) → upper is body; in upper (4-6) → lower is body
-  const bodyTriKey = lineNum <= 3 ? upperTriKey : lowerTriKey;
-  const useTriKey  = lineNum <= 3 ? lowerTriKey : upperTriKey;
+    // Derived hexagram: flip the moving line (lineNum is 1-based, index 0-based)
+    derivedArr = [...hexArr];
+    derivedArr[lineNum - 1] = 1 - derivedArr[lineNum - 1];
+    derivedKey = getHexKey(derivedArr);
+
+    // Body (体) and Use (用) trigrams
+    // Moving line in lower (1-3) → upper is body; in upper (4-6) → lower is body
+    bodyTriKey = lineNum <= 3 ? upperTriKey : lowerTriKey;
+    useTriKey = lineNum <= 3 ? lowerTriKey : upperTriKey;
+  }
 
   return {
     year, month, day, hour,
-    upperNum, lowerNum, lineNum,
+    upperNum, lowerNum,
     upperTriKey, lowerTriKey,
     bodyTriKey, useTriKey,
     hexArr, hexKey,
     derivedArr, derivedKey,
+    lineNum: lineNumForDisplay,
   };
 }
 
@@ -139,11 +167,12 @@ export default function MeiHua() {
   const [casting,  setCasting]  = useState(false);
   const [copied,   setCopied]   = useState(false);
   const [useUtc8,  setUseUtc8]  = useState(true);
+  const [funMode,  setFunMode]   = useState(false);
 
   const cast = () => {
     setCasting(true); setCopied(false);
     setTimeout(() => {
-      setResult(calculate(useUtc8));
+      setResult(calculate(useUtc8, funMode));
       setCasting(false);
     }, 800);
   };
@@ -231,6 +260,26 @@ export default function MeiHua() {
           <button style={tzBtnStyle(!useUtc8)} onClick={() => setUseUtc8(false)}>
             {t("mhy.tzLocal")}
           </button>
+        </div>
+      )}
+
+      {/* Fun mode toggle */}
+      {!done && (
+        <div style={{marginBottom:16,animation:"fi 0.5s ease"}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
+              {t("funMode.label")}
+            </span>
+            <button onClick={()=>setFunMode(!funMode)} style={{
+              background:funMode?"rgba(200,168,75,0.2)":"none",
+              border:"1px solid rgba(200,168,75,0.3)",
+              color:funMode?"#f5e09a":"rgba(200,168,75,0.5)",
+              padding:"6px 16px",fontSize:11,letterSpacing:2,
+              cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
+            }}>
+              {funMode?t("funMode.on"):t("funMode.off")}
+            </button>
+          </div>
         </div>
       )}
 

@@ -24,6 +24,15 @@ const HEXAGRAM_DB = {
 function castLine() { return [0,1,2].reduce(a => a + (Math.random()<0.5?2:3), 0); }
 function lineVal(v) { return (v===7||v===9) ? 1 : 0; }
 
+// Good hexagrams for fun mode (favorable outcomes)
+const GOOD_HEXAGRAMS = [1, 11, 14, 43, 52, 58, 11, 42, 5, 8, 10, 25, 17, 3, 44, 22];
+
+function drawFunModeHex() {
+  const targetNum = GOOD_HEXAGRAMS[Math.floor(Math.random() * GOOD_HEXAGRAMS.length)];
+  const targetKey = Object.keys(HEXAGRAM_DB).find(k => HEXAGRAM_DB[k].num === targetNum);
+  return targetKey || "111111";
+}
+
 function getHex(arr) {
   const key   = arr.join("");
   const entry = HEXAGRAM_DB[key];
@@ -147,15 +156,26 @@ export default function IChing() {
   const [casting,  setCasting]  = useState(false);
   const [step,     setStep]     = useState(0);
   const [copied,   setCopied]   = useState(false);
+  const [funMode,  setFunMode]  = useState(false);
 
   const cast = async () => {
     setCasting(true); setLines(null); setStep(0); setCopied(false);
     const r = [];
-    for (let i=0; i<6; i++) {
-      setStep(i+1);
-      await new Promise(res=>setTimeout(res,320));
-      r.push(castLine());
-      setLines([...r]);
+    if (funMode) {
+      const key = drawFunModeHex();
+      for (let i=0; i<6; i++) {
+        setStep(i+1);
+        await new Promise(res=>setTimeout(res,320));
+        r.push(parseInt(key[i]));
+        setLines([...r]);
+      }
+    } else {
+      for (let i=0; i<6; i++) {
+        setStep(i+1);
+        await new Promise(res=>setTimeout(res,320));
+        r.push(castLine());
+        setLines([...r]);
+      }
     }
     setCasting(false);
   };
@@ -204,6 +224,26 @@ export default function IChing() {
         <div style={{width:100,height:1,
           background:"linear-gradient(90deg,transparent,#c8a84b,transparent)",margin:"14px auto 0"}}/>
       </div>
+
+      {/* Fun mode toggle */}
+      {!done && (
+        <div style={{marginBottom:20,animation:"fi 0.5s ease"}}>
+          <div style={{display:"flex",gap:10,alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
+              {t("funMode.label")}
+            </span>
+            <button onClick={()=>setFunMode(!funMode)} style={{
+              background:funMode?"rgba(200,168,75,0.2)":"none",
+              border:"1px solid rgba(200,168,75,0.3)",
+              color:funMode?"#f5e09a":"rgba(200,168,75,0.5)",
+              padding:"6px 16px",fontSize:11,letterSpacing:2,
+              cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
+            }}>
+              {funMode?t("funMode.on"):t("funMode.off")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Question input */}
       {!done && (
