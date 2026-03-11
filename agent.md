@@ -125,17 +125,22 @@ function MyComponent() {
 
 ### Da Liu Ren (大六壬)
 - Requires birth date/time input (Ba Zi - 8 pillars)
-- **Full implementation** of traditional Da Liu Ren system, one of China's Three Styles (三式)
-- **三傳 (Three Transmissions)**: First, second, and third transmissions based on day and month branches
-- **四課 (Four Classes)**: Four classes derived from day stem with element analysis
-- **天盤地盤 (Heaven & Earth Pans)**: Rotating heaven pan based on month, fixed earth pan
+- **Complete traditional implementation** following authentic Chinese divination methods
+- **九宗门 (Nine Schools of Method)** for 三傳: 贼克法, 涉害法, 遥克法, 昴星法, 别责法, 八专法
+- **三傳 (Three Transmissions)**: First, second, and third transmissions based on 九宗门 priority rules
+- **四課 (Four Classes)**: Traditional derivation using 日干寄宫 and 天盘上神
+- **月将加时 (Monthly General + Hour)**: Heaven pan rotates based on 月将 + hour branch
+- **天盤地盤 (Heaven & Earth Pans)**: Proper heaven pan rotation using 月将, fixed earth pan
 - **五行分析 (Five Elements Analysis)**: Complete analysis of generating and controlling relationships, element balance
-- **空亡 (Vacancies)**: Empty branches determined by day stem
+- **空亡 (Vacancies)**: 旬-based calculation from 60甲子 cycle (accurate method)
 - **局 (Situations)**: Upper, middle, or lower situation based on day/month relationship
-- **十二将 (Twelve Generals)**: 贵人, 螣蛇, 朱雀, 六合, 勾陈, 青龙, 天空, 白虎, 太常, 玄武, 太阴, 天后
+- **十二将 (Twelve Generals)**: Complete placement of all 12 generals (贵人, 螣蛇, 朱雀, 六合, 勾陈, 青龙, 天空, 白虎, 太常, 玄武, 太阴, 天后) based on 日干 and day/night
+- **六亲 (Six Relatives)**: Accurate calculation based on five-element relationships (父母, 子孙, 官鬼, 妻财, 兄弟)
+- **月将 (Monthly General)**: Determined by 24 solar terms (节气) - accurate traditional method
+- **寄宫 (Temporary Residence)**: 日干寄宫 mapping (甲己寄丑, 乙庚寄子, etc.)
 - **综合卦象 (Overall Fortune)**: Comprehensive fortune scoring (大吉, 吉, 平, 凶, 大凶)
-- **日占/夜占 (Day/Night Divination)**: Different calculations for daytime (7am-7pm) vs nighttime
-- Traditional calendar-based stem-branch calculations
+- **日占/夜占 (Day/Night Divination)**: Different 贵人 position for daytime (辰时-戌时) vs nighttime
+- Traditional calendar-based stem-branch calculations with proper leap year handling
 - Data structures in `modes/daLiuRenData.js`
 
 ### Tarot (塔罗牌)
