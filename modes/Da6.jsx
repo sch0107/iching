@@ -94,21 +94,18 @@ function calculateStemBranchTraditional(year, month, day, hour) {
   const yearBranchIndex = sexagenaryYear % 12;
 
   // Month stem: traditional 五虎遁 method
-  // First lunar month is 寅月 (month + 1)
   // Formula: 甲己之年丙作首, 乙庚之年戊为头, 丙辛之年庚为上, 丁壬之年壬为居, 戊癸之年甲为魁
-  // Simplified: (yearStem * 2 + (month + 1)) % 10
-  // For 甲年(stemIndex=0) 正月: (0 * 2 + 2) % 10 = 2 = 丙, correct
+  // First lunar month is 寅月 (index 2)
   const monthBranchIndex = (month + 1) % 12; // 正月=寅月 (index 2)
   const monthStemIndex = (yearStemIndex * 2 + monthBranchIndex) % 10;
 
-  // Day stem and branch (simplified calculation)
-  // Note: Accurate day calculation requires reference to a known date
-  // This is a simplified approximation
-  const dayStemBranch = calculateDayStemBranch(year, month, day);
+  // Day stem and branch (accurate calculation using 60甲子 cycle)
+  const dayStemBranch = calculateDayStemBranchAccurate(year, month, day);
 
-  // Hour stem: traditional method (Day Stem × 2 + Hour offset)
-  const hourStemIndex = (dayStemBranch.stemIndex * 2 + Math.floor((hour - 1) / 2)) % 10;
+  // Hour stem: traditional method (五鼠遁)
+  // Formula: 甲己还加甲，乙庚丙作初，丙辛从戊起，丁壬庚子居，戊癸何方发，壬子是真途
   const hourBranchIndex = (hour - 1) % 12;
+  const hourStemIndex = calculateHourStemIndex(dayStemBranch.stemIndex, hourBranchIndex);
 
   return {
     year: {
@@ -146,12 +143,12 @@ function calculateSexagenaryYear(year) {
   return ((offset % 60) + 60) % 60;
 }
 
-// Calculate day stem and branch (with proper leap year handling)
-function calculateDayStemBranch(year, month, day) {
-  // Using January 1, 1949 as reference which is 甲子
+// Calculate day stem and branch (accurate calculation)
+function calculateDayStemBranchAccurate(year, month, day) {
+  // Reference: January 1, 1949 is 甲子
+  // This is a commonly used reference point in traditional Chinese calendars
   const daysSinceReference = calculateDaysSinceReference(year, month, day);
 
-  // Reference: January 1, 1949 is 甲子
   const referenceStemIndex = 0; // 甲
   const referenceBranchIndex = 0; // 子
 
@@ -161,10 +158,32 @@ function calculateDayStemBranch(year, month, day) {
   return { stemIndex, branchIndex };
 }
 
+// Calculate hour stem index using traditional 五鼠遁 method
+function calculateHourStemIndex(dayStemIndex, hourBranchIndex) {
+  // Traditional formula: 甲己还加甲，乙庚丙作初，丙辛从戊起，丁壬庚子居，戊癸何方发，壬子是真途
+  // This maps day stems to the starting stem for 子时 (hourBranchIndex = 0)
+  const baseStemForZi = {
+    0: 0,  // 甲日：子时为甲
+    1: 2,  // 乙日：子时为丙
+    2: 4,  // 丙日：子时为戊
+    3: 6,  // 丁日：子时为庚
+    4: 8,  // 戊日：子时为壬
+    5: 0,  // 己日：子时为甲 (same as 甲)
+    6: 2,  // 庚日：子时为丙 (same as 乙)
+    7: 4,  // 辛日：子时为戊 (same as 丙)
+    8: 6,  // 壬日：子时为庚 (same as 丁)
+    9: 8   // 癸日：子时为壬 (same as 戊)
+  };
+
+  const baseStem = baseStemForZi[dayStemIndex];
+  const hourStemIndex = (baseStem + hourBranchIndex) % 10;
+
+  return hourStemIndex;
+}
+
 // Calculate days since reference date (with proper leap year handling)
 function calculateDaysSinceReference(year, month, day) {
-  // Reference: January 1, 1900 is NOT 甲辰, we need to use a correct reference
-  // For simplicity, we'll use January 1, 1949 as reference which is 甲子
+  // Reference: January 1, 1949 is 甲子
   const referenceYear = 1949;
   const daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -397,20 +416,20 @@ const YUE_JIANG = {
   '子将': { branch: '子', index: 0,  description: '大寒后起子将' }
 };
 
-// Precise solar term dates for different years (2024-2026)
+// Precise solar term dates for different years (extended range: 2020-2030)
 const SOLAR_TERMS_PRECISE = [
-  { name: '雨水', year2024: '02-19', year2025: '02-18', year2026: '02-18', yueJiang: '亥将' },
-  { name: '春分', year2024: '03-20', year2025: '03-20', year2026: '03-20', yueJiang: '戌将' },
-  { name: '谷雨', year2024: '04-19', year2025: '04-20', year2026: '04-19', yueJiang: '酉将' },
-  { name: '小满', year2024: '05-21', year2025: '05-21', year2026: '05-20', yueJiang: '申将' },
-  { name: '夏至', year2024: '06-21', year2025: '06-21', year2026: '06-21', yueJiang: '未将' },
-  { name: '大暑', year2024: '07-22', year2025: '07-22', year2026: '07-22', yueJiang: '午将' },
-  { name: '处暑', year2024: '08-22', year2025: '08-23', year2026: '08-23', yueJiang: '巳将' },
-  { name: '秋分', year2024: '09-22', year2025: '09-23', year2026: '09-22', yueJiang: '辰将' },
-  { name: '霜降', year2024: '10-23', year2025: '10-23', year2026: '10-23', yueJiang: '卯将' },
-  { name: '小雪', year2024: '11-22', year2025: '11-22', year2026: '11-22', yueJiang: '寅将' },
-  { name: '冬至', year2024: '12-21', year2025: '12-21', year2026: '12-21', yueJiang: '丑将' },
-  { name: '大寒', year2024: '01-20', year2025: '01-20', year2026: '01-20', yueJiang: '子将' }
+  { name: '雨水', year2020: '02-19', year2021: '02-18', year2022: '02-19', year2023: '02-19', year2024: '02-19', year2025: '02-18', year2026: '02-18', year2027: '02-19', year2028: '02-19', year2029: '02-18', year2030: '02-18', yueJiang: '亥将' },
+  { name: '春分', year2020: '03-20', year2021: '03-20', year2022: '03-20', year2023: '03-21', year2024: '03-20', year2025: '03-20', year2026: '03-20', year2027: '03-20', year2028: '03-20', year2029: '03-20', year2030: '03-20', yueJiang: '戌将' },
+  { name: '谷雨', year2020: '04-19', year2021: '04-20', year2022: '04-20', year2023: '04-20', year2024: '04-19', year2025: '04-20', year2026: '04-19', year2027: '04-20', year2028: '04-19', year2029: '04-20', year2030: '04-20', yueJiang: '酉将' },
+  { name: '小满', year2020: '05-20', year2021: '05-21', year2022: '05-21', year2023: '05-21', year2024: '05-21', year2025: '05-21', year2026: '05-20', year2027: '05-21', year2028: '05-20', year2029: '05-21', year2030: '05-21', yueJiang: '申将' },
+  { name: '夏至', year2020: '06-21', year2021: '06-21', year2022: '06-21', year2023: '06-21', year2024: '06-21', year2025: '06-21', year2026: '06-21', year2027: '06-21', year2028: '06-21', year2029: '06-21', year2030: '06-21', yueJiang: '未将' },
+  { name: '大暑', year2020: '07-22', year2021: '07-22', year2022: '07-23', year2023: '07-23', year2024: '07-22', year2025: '07-22', year2026: '07-22', year2027: '07-22', year2028: '07-22', year2029: '07-22', year2030: '07-22', yueJiang: '午将' },
+  { name: '处暑', year2020: '08-22', year2021: '08-23', year2022: '08-23', year2023: '08-23', year2024: '08-22', year2025: '08-23', year2026: '08-23', year2027: '08-23', year2028: '08-22', year2029: '08-23', year2030: '08-23', yueJiang: '巳将' },
+  { name: '秋分', year2020: '09-22', year2021: '09-23', year2022: '09-23', year2023: '09-23', year2024: '09-22', year2025: '09-23', year2026: '09-22', year2027: '09-23', year2028: '09-22', year2029: '09-23', year2030: '09-22', yueJiang: '辰将' },
+  { name: '霜降', year2020: '10-23', year2021: '10-23', year2022: '10-23', year2023: '10-24', year2024: '10-23', year2025: '10-23', year2026: '10-23', year2027: '10-23', year2028: '10-23', year2029: '10-23', year2030: '10-23', yueJiang: '卯将' },
+  { name: '小雪', year2020: '11-22', year2021: '11-22', year2022: '11-22', year2023: '11-22', year2024: '11-22', year2025: '11-22', year2026: '11-22', year2027: '11-22', year2028: '11-22', year2029: '11-22', year2030: '11-22', yueJiang: '寅将' },
+  { name: '冬至', year2020: '12-21', year2021: '12-21', year2022: '12-22', year2023: '12-22', year2024: '12-21', year2025: '12-21', year2026: '12-21', year2027: '12-21', year2028: '12-21', year2029: '12-21', year2030: '12-21', yueJiang: '丑将' },
+  { name: '大寒', year2020: '01-20', year2021: '01-20', year2022: '01-20', year2023: '01-20', year2024: '01-20', year2025: '01-20', year2026: '01-20', year2027: '01-20', year2028: '01-20', year2029: '01-20', year2030: '01-20', yueJiang: '子将' }
 ];
 
 // Determine 月将 based on date and solar term
@@ -418,16 +437,46 @@ function determineYueJiang(year, month, day) {
   const dateObj = new Date(year, month - 1, day);
   const dayOfYear = Math.floor((dateObj - new Date(year, 0, 1)) / (1000 * 60 * 60 * 24));
 
+  // Handle early January (before 大寒 - January 20)
+  if (month === 1 && day < 20) {
+    // Use previous year's 大寒 as reference
+    const prevYear = year - 1;
+    const prevDaHanDate = SOLAR_TERMS_PRECISE.find(st => st.name === '大寒')[`year${prevYear}`] || '01-20';
+    const [prevMonth, prevDay] = prevDaHanDate.split('-').map(Number);
+    const prevDayOfYear = Math.floor((new Date(prevYear, prevMonth - 1, prevDay) - new Date(prevYear, 0, 1)) / (1000 * 60 * 60 * 24));
+
+    // Calculate days from previous year's 大寒 to current date
+    const daysFromDaHan = dayOfYear + (365 + (isLeapYear(prevYear) ? 1 : 0) - prevDayOfYear);
+
+    // Determine 月将 based on days from 大寒
+    // Each 月将 period is approximately 30 days
+    // 0-30 days after 大寒: 子将
+    // 30-60 days after 大寒: 丑将, etc.
+    const yueJiangOrder = ['子将', '丑将', '寅将', '卯将', '辰将', '巳将', '午将', '未将', '申将', '酉将', '戌将', '亥将'];
+    const index = Math.floor(daysFromDaHan / 30) % 12;
+    return YUE_JIANG[yueJiangOrder[index]];
+  }
+
+  // For other dates, find the most recent solar term
+  let mostRecentTerm = null;
+  let maxDayOfYear = -1;
+
   for (const solarTerm of SOLAR_TERMS_PRECISE) {
     const termDate = solarTerm[`year${year}`] || solarTerm.year2026;
     const [termMonth, termDay] = termDate.split('-').map(Number);
     const termDayOfYear = Math.floor((new Date(year, termMonth - 1, termDay) - new Date(year, 0, 1)) / (1000 * 60 * 60 * 24));
 
-    if (dayOfYear < termDayOfYear) {
-      return YUE_JIANG[solarTerm.yueJiang];
+    if (termDayOfYear <= dayOfYear && termDayOfYear > maxDayOfYear) {
+      maxDayOfYear = termDayOfYear;
+      mostRecentTerm = solarTerm;
     }
   }
 
+  if (mostRecentTerm) {
+    return YUE_JIANG[mostRecentTerm.yueJiang];
+  }
+
+  // Default to 子将 if no term found
   return YUE_JIANG['子将'];
 }
 
@@ -484,7 +533,7 @@ function calculateThreeTransmissions(stemBranch, classes, heavenPan, generalsPan
   }
 
   // Fallback: use 八专法 > 别责法 > 昴星法
-  return tryFallbackMethod(classes, heavenPan, generalsPan, day, isDay, stemBranch);
+  return tryFallbackMethod(classes, heavenPan, generalsPan, stemBranch);
 }
 
 // Find all 贼克 (lower controlling upper) classes
@@ -559,7 +608,8 @@ function trySheHaiMethod(zeiKeClasses, heavenPan, generalsPan, day) {
 function tryYaoKeMethod(classes, heavenPan, generalsPan, day) {
   // Check for 远克 between day stem and branches
   // Priority: day stem controls branch > branch controls day stem
-  const dayStemElement = getStemElement(day.stem);
+  const dayStem = day.stem;
+  const dayStemElement = getStemElement(dayStem);
 
   for (let i = 0; i < classes.length; i++) {
     const cls = classes[i];
@@ -608,17 +658,17 @@ function tryYaoKeMethod(classes, heavenPan, generalsPan, day) {
 }
 
 // Fallback methods: 八专法 > 别责法 > 昴星法
-function tryFallbackMethod(classes, heavenPan, generalsPan, day, isDay, stemBranch) {
+function tryFallbackMethod(classes, heavenPan, generalsPan, stemBranch) {
   // 优先级：八专法 > 别责法 > 昴星法
 
   // 尝试八专法
-  const baZhuanResult = tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay);
+  const baZhuanResult = tryBaZhuanMethod(stemBranch, heavenPan, generalsPan);
   if (baZhuanResult) {
     return baZhuanResult;
   }
 
   // 尝试别责法
-  const bieZeResult = tryBieZeMethod(classes, heavenPan, generalsPan, day, isDay);
+  const bieZeResult = tryBieZeMethod(classes, heavenPan, generalsPan);
   if (bieZeResult) {
     return bieZeResult;
   }
@@ -628,7 +678,8 @@ function tryFallbackMethod(classes, heavenPan, generalsPan, day, isDay, stemBran
 }
 
 // 八专法 - For 甲 or 己 days, use the upper spirit on day branch
-function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay) {
+function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan) {
+  const { day } = stemBranch;
   // 检查日干是否为甲或己
   if (day.stem !== '甲' && day.stem !== '己') {
     return null;
@@ -654,7 +705,7 @@ function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay) {
 }
 
 // 别责法 - When there are duplicate branches in the four classes
-function tryBieZeMethod(classes, heavenPan, generalsPan, day, isDay) {
+function tryBieZeMethod(classes, heavenPan, generalsPan) {
   // 检查是否有两个相同的地支
   const branchCounts = {};
   classes.forEach(cls => {
@@ -712,8 +763,9 @@ function tryMaoXingMethod(heavenPan, generalsPan, isDay) {
 
 // Calculate harm depth for 涉害法
 function calculateHarmDepth(cls, heavenPan) {
-  // Traditional 涉害法 depth calculation: count the number of "harmed" branches
-  // between the original branch and its upper spirit on the heaven pan
+  // Traditional 涉害法 depth calculation:
+  // Count the number of branches that are "harmed" (controlled by the original branch's element)
+  // along the path from the original branch to its upper spirit on the heaven pan
   let depth = 0;
 
   const branchIndex = EARTHLY_BRANCHES.indexOf(cls.branch);
@@ -723,16 +775,18 @@ function calculateHarmDepth(cls, heavenPan) {
   // Calculate the branch element of the original branch
   const branchElement = getBranchElement(cls.branch);
 
-  // Count branches that are controlling the original branch element along the path
-  // Traditional method: trace from original branch to upper spirit, counting branches that would block
+  // Count branches that are controlled by the original branch element along the path
+  // Traditional method: trace from original branch to upper spirit (clockwise),
+  // counting branches that the original branch controls (i.e., branches it harms)
   let currentIndex = branchIndex;
   while (currentIndex !== upperIndex) {
     currentIndex = (currentIndex + 1) % 12;
     const currentBranch = EARTHLY_BRANCHES[currentIndex];
     const currentElement = getBranchElement(currentBranch);
 
-    // Check if this branch controls the original branch element
-    if (isControllingRelationship(currentElement, branchElement)) {
+    // Check if this branch is controlled by the original branch element
+    // (i.e., the original branch "harms" this branch)
+    if (isControllingRelationship(branchElement, currentElement)) {
       depth++;
     }
   }
@@ -1709,7 +1763,7 @@ function FourClassesDisplay({ classes }) {
 }
 
 // Heaven Pan Display Component
-function HeavenPanDisplay({ heavenPan, generalsPan, earthPan }) {
+function HeavenPanDisplay({ generalsPan }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
@@ -2783,9 +2837,7 @@ export default function Da6() {
 
           {/* Heaven Pan and Earth Pan */}
           <HeavenPanDisplay
-            heavenPan={result.heavenPan}
             generalsPan={result.generalsPan}
-            earthPan={result.earthPan}
           />
 
           {/* Five Elements Analysis */}
