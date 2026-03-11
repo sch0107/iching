@@ -466,19 +466,19 @@ function calculateThreeTransmissions(stemBranch, classes, heavenPan, generalsPan
 
   // If only one 贼克, use 贼克法 directly
   if (zeiKeClasses.length === 1) {
-    return useZeiKeMethod(zeiKeClasses[0], heavenPan, day);
+    return useZeiKeMethod(zeiKeClasses[0], heavenPan, generalsPan, day);
   }
 
   // If multiple 贼克, use 涉害法 to compare depth
   if (zeiKeClasses.length > 1) {
-    const sheHaiResult = trySheHaiMethod(zeiKeClasses, heavenPan, day);
+    const sheHaiResult = trySheHaiMethod(zeiKeClasses, heavenPan, generalsPan, day);
     if (sheHaiResult) {
       return sheHaiResult;
     }
   }
 
   // If no 贼克, try 遥克法
-  const yaoKeResult = tryYaoKeMethod(classes, heavenPan, day);
+  const yaoKeResult = tryYaoKeMethod(classes, heavenPan, generalsPan, day);
   if (yaoKeResult) {
     return yaoKeResult;
   }
@@ -509,7 +509,7 @@ function findZeiKeClasses(classes, heavenPan) {
 }
 
 // Use 贼克法 when only one 贼克 exists
-function useZeiKeMethod(zeiKeClass, heavenPan, day) {
+function useZeiKeMethod(zeiKeClass, heavenPan, generalsPan, day) {
   const firstTransmission = {
     general: zeiKeClass.class.general,
     element: zeiKeClass.class.element,
@@ -518,8 +518,8 @@ function useZeiKeMethod(zeiKeClass, heavenPan, day) {
   };
 
   // Calculate second and third transmissions
-  const second = calculateNextTransmission(firstTransmission, heavenPan);
-  const third = calculateNextTransmission(second, heavenPan);
+  const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+  const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
   return {
     first: firstTransmission,
@@ -529,7 +529,7 @@ function useZeiKeMethod(zeiKeClass, heavenPan, day) {
 }
 
 // 涉害法 - Compare depth of harm when multiple 贼克
-function trySheHaiMethod(zeiKeClasses, heavenPan, day) {
+function trySheHaiMethod(zeiKeClasses, heavenPan, generalsPan, day) {
   if (zeiKeClasses.length === 0) {
     return null; // No 贼克 found
   }
@@ -545,8 +545,8 @@ function trySheHaiMethod(zeiKeClasses, heavenPan, day) {
     type: TRANSMISSION_TYPES.first
   };
 
-  const second = calculateNextTransmission(firstTransmission, heavenPan);
-  const third = calculateNextTransmission(second, heavenPan);
+  const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+  const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
   return {
     first: firstTransmission,
@@ -556,7 +556,7 @@ function trySheHaiMethod(zeiKeClasses, heavenPan, day) {
 }
 
 // 遥克法 - Check for distant control when no internal 贼克
-function tryYaoKeMethod(classes, heavenPan, day) {
+function tryYaoKeMethod(classes, heavenPan, generalsPan, day) {
   // Check for 远克 between day stem and branches
   // Priority: day stem controls branch > branch controls day stem
   const dayStemElement = getStemElement(day.stem);
@@ -593,8 +593,8 @@ function tryYaoKeMethod(classes, heavenPan, day) {
         type: TRANSMISSION_TYPES.first
       };
 
-      const second = calculateNextTransmission(firstTransmission, heavenPan);
-      const third = calculateNextTransmission(second, heavenPan);
+      const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+      const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
       return {
         first: firstTransmission,
@@ -643,8 +643,8 @@ function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay) {
     type: TRANSMISSION_TYPES.first
   };
 
-  const second = calculateNextTransmission(firstTransmission, heavenPan);
-  const third = calculateNextTransmission(second, heavenPan);
+  const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+  const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
   return {
     first: firstTransmission,
@@ -674,8 +674,8 @@ function tryBieZeMethod(classes, heavenPan, generalsPan, day, isDay) {
       type: TRANSMISSION_TYPES.first
     };
 
-    const second = calculateNextTransmission(firstTransmission, heavenPan);
-    const third = calculateNextTransmission(second, heavenPan);
+    const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+    const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
     return {
       first: firstTransmission,
@@ -700,8 +700,8 @@ function tryMaoXingMethod(heavenPan, generalsPan, isDay) {
     type: TRANSMISSION_TYPES.first
   };
 
-  const second = calculateNextTransmission(firstTransmission, heavenPan);
-  const third = calculateNextTransmission(second, heavenPan);
+  const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+  const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
   return {
     first: firstTransmission,
@@ -741,12 +741,12 @@ function calculateHarmDepth(cls, heavenPan) {
 }
 
 // Calculate next transmission based on current transmission
-function calculateNextTransmission(currentTransmission, heavenPan) {
-  // Find the branch corresponding to current general
+function calculateNextTransmission(currentTransmission, heavenPan, generalsPan) {
+  // Find the branch corresponding to current general using generalsPan
   let branchIndex = -1;
   for (let i = 0; i < EARTHLY_BRANCHES.length; i++) {
     const branch = EARTHLY_BRANCHES[i];
-    if (heavenPan[branch].general.name === currentTransmission.general.name) {
+    if (generalsPan[branch].general.name === currentTransmission.general.name) {
       branchIndex = i;
       break;
     }
@@ -764,14 +764,16 @@ function calculateNextTransmission(currentTransmission, heavenPan) {
     };
   }
 
-  // Get the upper spirit for this branch
+  // Get the upper branch for this position using heavenPan
   const upperBranch = heavenPan[EARTHLY_BRANCHES[branchIndex]].branch;
-  const upperSpirit = heavenPan[upperBranch];
+
+  // Get the general for the upper branch using generalsPan
+  const upperGeneral = generalsPan[upperBranch].general;
 
   return {
-    general: upperSpirit.general,
-    element: upperSpirit.general.element,
-    description: `${upperBranch}之${upperSpirit.general.name}`,
+    general: upperGeneral,
+    element: upperGeneral.element,
+    description: `${upperBranch}之${upperGeneral.name}`,
     type: '续传'
   };
 }
@@ -1707,7 +1709,7 @@ function FourClassesDisplay({ classes }) {
 }
 
 // Heaven Pan Display Component
-function HeavenPanDisplay({ heavenPan, earthPan }) {
+function HeavenPanDisplay({ heavenPan, generalsPan, earthPan }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
@@ -1742,7 +1744,7 @@ function HeavenPanDisplay({ heavenPan, earthPan }) {
                 fontSize: 14,
                 color: '#f5e09a'
               }}>
-                {heavenPan[branch].general.name}
+                {generalsPan && generalsPan[branch] ? generalsPan[branch].general.name : '-'}
               </div>
             </div>
           ))}
@@ -2782,6 +2784,7 @@ export default function Da6() {
           {/* Heaven Pan and Earth Pan */}
           <HeavenPanDisplay
             heavenPan={result.heavenPan}
+            generalsPan={result.generalsPan}
             earthPan={result.earthPan}
           />
 
