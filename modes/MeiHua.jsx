@@ -270,7 +270,7 @@ export default function MeiHua() {
             <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
               {t("funMode.label")}
             </span>
-            <div style={{display:"flex",alignItems:"center",gap:8"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
               <button
                 onClick={()=>setFunMode(false)}
                 style={{
