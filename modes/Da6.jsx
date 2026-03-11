@@ -17,7 +17,20 @@ import {
   getGeneralByPosition,
   calculateBalanceScore,
   isElementsBalanced,
-  countElements
+  countElements,
+  TIAN_YI_GUI_REN,
+  YUE_DE,
+  YUE_HE,
+  SAN_QI,
+  LIU_YI,
+  SHEN_SHA,
+  LIU_HE,
+  LIU_CHONG,
+  SAN_HE,
+  SAN_HUI,
+  FANG,
+  XING,
+  WANG_XIANG_XIU_QIU_SI
 } from './daLiuRenData.js';
 
 const GOLD = "rgba(200,168,75,";
@@ -982,6 +995,314 @@ function calculateSituation(stemBranch) {
   return SITUATIONS.lower;
 }
 
+// ==================== Divine Spirit Analysis Functions (神煞分析) ====================
+
+// Calculate Tian Yi Gui Ren (天乙贵人)
+function calculateTianYiGuiRen(dayStem) {
+  const guiRenBranches = TIAN_YI_GUI_REN.branches[dayStem] || [];
+  return {
+    branches: guiRenBranches,
+    fortune: TIAN_YI_GUI_REN.fortune,
+    description: TIAN_YI_GUI_REN.description
+  };
+}
+
+// Calculate Monthly Virtue and Harmony (月德和月合)
+function calculateYueDeHe(monthBranch) {
+  const monthNumber = EARTHLY_BRANCHES.indexOf(monthBranch) + 1;
+  const yueDeBranch = YUE_DE.monthToBranch[monthNumber];
+  const yueHeBranch = YUE_HE.monthToBranch[monthNumber];
+
+  return {
+    yueDe: {
+      branch: yueDeBranch,
+      fortune: YUE_DE.fortune,
+      description: YUE_DE.description
+    },
+    yueHe: {
+      branch: yueHeBranch,
+      fortune: YUE_HE.fortune,
+      description: YUE_HE.description
+    }
+  };
+}
+
+// Calculate Three Marvels and Six Instruments (三奇六仪)
+function calculateSanQiLiuYi(dayStem) {
+  const sanQiActive = SAN_QI.heavenly.includes(dayStem) ||
+                   SAN_QI.earthly.includes(dayStem);
+  const liuYiActive = LIU_YI.stems.includes(dayStem);
+
+  return {
+    sanQi: {
+      active: sanQiActive,
+      fortune: sanQiActive ? SAN_QI.fortune : 0,
+      description: sanQiActive ? SAN_QI.description : ''
+    },
+    liuYi: {
+      active: liuYiActive,
+      fortune: liuYiActive ? LIU_YI.fortune : 0,
+      description: liuYiActive ? LIU_YI.description : ''
+    }
+  };
+}
+
+// Calculate Post Horse, Peach Blossom, and Flower Canopy (驿马桃花华盖)
+function calculateYiMaTaoHuaHuaGai(dayBranch) {
+  return {
+    yiMa: {
+      branch: SHEN_SHA.YI_MA.branches[dayBranch],
+      fortune: SHEN_SHA.YI_MA.fortune,
+      description: SHEN_SHA.YI_MA.description
+    },
+    taoHua: {
+      branch: SHEN_SHA.TAO_HUA.branches[dayBranch],
+      fortune: SHEN_SHA.TAO_HUA.fortune,
+      description: SHEN_SHA.TAO_HUA.description
+    },
+    huaGai: {
+      branch: SHEN_SHA.HUA_GAI.branches[dayBranch],
+      fortune: SHEN_SHA.HUA_GAI.fortune,
+      description: SHEN_SHA.HUA_GAI.description
+    }
+  };
+}
+
+// Calculate all divine spirits (计算所有神煞)
+function calculateAllShenSha(stemBranch) {
+  const { day, month } = stemBranch;
+
+  return {
+    tianYiGuiRen: calculateTianYiGuiRen(day.stem),
+    yueDeHe: calculateYueDeHe(month.branch),
+    sanQiLiuYi: calculateSanQiLiuYi(day.stem),
+    yiMaTaoHuaHuaGai: calculateYiMaTaoHuaHuaGai(day.branch)
+  };
+}
+
+// ==================== Earthly Branch Relationships Functions (地支关系函数) ====================
+
+// Check for 六合
+function checkLiuHe(branch1, branch2) {
+  const combination = LIU_HE.combinations.find(c =>
+    (c.branch1 === branch1 && c.branch2 === branch2) ||
+    (c.branch1 === branch2 && c.branch2 === branch1)
+  );
+
+  if (combination) {
+    return {
+      active: true,
+      relationship: '六合',
+      element: combination.element,
+      fortune: LIU_HE.fortune,
+      description: LIU_HE.description
+    };
+  }
+  return { active: false };
+}
+
+// Check for 六冲
+function checkLiuChong(branch1, branch2) {
+  const clash = LIU_CHONG.clashes.find(c =>
+    (c.branch1 === branch1 && c.branch2 === branch2) ||
+    (c.branch1 === branch2 && c.branch2 === branch1)
+  );
+
+  if (clash) {
+    return {
+      active: true,
+      relationship: '六冲',
+      fortune: LIU_CHONG.fortune,
+      description: LIU_CHONG.description
+    };
+  }
+  return { active: false };
+}
+
+// Check for 三合
+function checkSanHe(branch1, branch2, branch3) {
+  const branches = [branch1, branch2, branch3].sort();
+  const harmony = SAN_HE.harmonies.find(h =>
+    h.branches.every(b => branches.includes(b))
+  );
+
+  if (harmony) {
+    return {
+      active: true,
+      relationship: '三合',
+      element: harmony.element,
+      name: harmony.name,
+      fortune: SAN_HE.fortune,
+      description: SAN_HE.description
+    };
+  }
+  return { active: false };
+}
+
+// Check for 三会
+function checkSanHui(branches) {
+  for (const meeting of SAN_HUI.meetings) {
+    if (meeting.branches.every(b => branches.includes(b))) {
+      return {
+        active: true,
+        relationship: '三会',
+        element: meeting.element,
+        name: meeting.name,
+        fortune: SAN_HUI.fortune,
+        description: SAN_HUI.description
+      };
+    }
+  }
+  return { active: false };
+}
+
+// Check for 方
+function checkFang(branch) {
+  for (const [direction, directionBranches] of Object.entries(FANG.directions)) {
+    if (directionBranches.includes(branch)) {
+      return {
+        active: true,
+        relationship: '方',
+        direction: direction,
+        fortune: FANG.fortune,
+        description: FANG.description
+      };
+    }
+  }
+  return { active: false };
+}
+
+// Check for 刑
+function checkXing(branch1, branch2) {
+  // Check for simple punishment (子卯)
+  const simplePunishment = XING.punishments.find(p =>
+    (p.branch1 === branch1 && p.branch2 === branch2) ||
+    (p.branch1 === branch2 && p.branch2 === branch1)
+  );
+
+  if (simplePunishment) {
+    return {
+      active: true,
+      relationship: '刑',
+      type: simplePunishment.type,
+      fortune: XING.fortune,
+      description: XING.description
+    };
+  }
+
+  // Check for three-element punishment (寅巳申, 丑未戌, 自刑)
+  for (const punishment of XING.punishments) {
+    if (punishment.branches &&
+        punishment.branches.includes(branch1) &&
+        punishment.branches.includes(branch2)) {
+      return {
+        active: true,
+        relationship: '三刑',
+        type: punishment.type,
+        fortune: XING.fortune,
+        description: XING.description
+      };
+    }
+  }
+
+  return { active: false };
+}
+
+// Check all branch relationships
+function checkAllBranchRelationships(branches) {
+  const relationships = {
+    liuHe: [],
+    liuChong: [],
+    sanHe: null,
+    sanHui: null,
+    fang: [],
+    xing: []
+  };
+
+  // Check two-branch relationships
+  for (let i = 0; i < branches.length; i++) {
+    for (let j = i + 1; j < branches.length; j++) {
+      const liuHe = checkLiuHe(branches[i], branches[j]);
+      const liuChong = checkLiuChong(branches[i], branches[j]);
+      const xing = checkXing(branches[i], branches[j]);
+
+      if (liuHe.active) relationships.liuHe.push(liuHe);
+      if (liuChong.active) relationships.liuChong.push(liuChong);
+      if (xing.active) relationships.xing.push(xing);
+    }
+
+    // Check for 方
+    const fang = checkFang(branches[i]);
+    if (fang.active && !relationships.fang.find(f => f.direction === f.direction)) {
+      relationships.fang.push(fang);
+    }
+  }
+
+  // Check for 三合
+  if (branches.length >= 3) {
+    relationships.sanHe = checkSanHe(branches[0], branches[1], branches[2]);
+  }
+
+  // Check for 三会
+  relationships.sanHui = checkSanHui(branches);
+
+  return relationships;
+}
+
+// ==================== Elemental Prosperity States Functions (旺相休囚死函数) ====================
+
+// Determine season by month branch
+function getSeasonByMonthBranch(monthBranch) {
+  if (['寅', '卯', '辰'].includes(monthBranch)) {
+    return WANG_XIANG_XIU_QIU_SI.spring;
+  } else if (['巳', '午', '未'].includes(monthBranch)) {
+    return WANG_XIANG_XIU_QIU_SI.summer;
+  } else if (['申', '酉', '戌'].includes(monthBranch)) {
+    return WANG_XIANG_XIU_QIU_SI.autumn;
+  } else if (['亥', '子', '丑'].includes(monthBranch)) {
+    return WANG_XIANG_XIU_QIU_SI.winter;
+  }
+  return WANG_XIANG_XIU_QIU_SI.spring; // Default
+}
+
+// Calculate element state based on month branch
+function calculateElementState(element, monthBranch) {
+  const season = getSeasonByMonthBranch(monthBranch);
+  const state = season.states[element];
+
+  return {
+    element: element,
+    state: state.state,
+    strength: state.strength,
+    description: state.description,
+    season: season.name
+  };
+}
+
+// Analyze all element states
+function analyzeAllElementStates(monthBranch) {
+  const season = getSeasonByMonthBranch(monthBranch);
+  const elements = ['木', '火', '土', '金', '水'];
+
+  const analysis = {};
+  elements.forEach(element => {
+    analysis[element] = calculateElementState(element, monthBranch);
+  });
+
+  return {
+    season: season.name,
+    monthBranch: monthBranch,
+    elements: analysis,
+    summary: {
+      wang: elements.find(e => analysis[e].state === '旺'),
+      xiang: elements.find(e => analysis[e].state === '相'),
+      xiu: elements.find(e => analysis[e].state === '休'),
+      qiu: elements.find(e => analysis[e].state === '囚'),
+      si: elements.find(e => analysis[e].state === '死')
+    }
+  };
+}
+
 // Five Element Analysis
 function analyzeFiveElements(stemBranch, transmissions, classes) {
   const analysis = {
@@ -1192,6 +1513,20 @@ function calculateDa6Full(year, month, day, hour, funMode) {
   // Calculate overall fortune
   const overallFortune = calculateOverallFortune(transmissions, classes, elementAnalysis);
 
+  // Calculate Divine Spirit Analysis (神煞分析)
+  const shenShaAnalysis = calculateAllShenSha(pillars);
+
+  // Calculate Branch Relationships (地支关系分析)
+  const allBranches = [
+    pillars.day.branch,
+    pillars.month.branch,
+    ...classes.map(c => c.branch)
+  ];
+  const branchRelationships = checkAllBranchRelationships(allBranches);
+
+  // Calculate Element States (旺相休囚死分析)
+  const elementStates = analyzeAllElementStates(pillars.month.branch);
+
   return {
     pillars,
     transmissions,
@@ -1203,6 +1538,9 @@ function calculateDa6Full(year, month, day, hour, funMode) {
     situation,
     elementAnalysis,
     overallFortune,
+    shenShaAnalysis,
+    branchRelationships,
+    elementStates,
     isDay
   };
 }
@@ -1597,6 +1935,507 @@ function SituationDisplay({ situation, isDay }) {
   );
 }
 
+// ==================== New Display Components ====================
+
+// Divine Spirit Display (神煞显示)
+function ShenShaDisplay({ shenShaAnalysis }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
+        神煞分析
+      </div>
+
+      {/* 天乙贵人 */}
+      {shenShaAnalysis.tianYiGuiRen.branches.length > 0 && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(200,168,75,0.03)',
+          border: '1px solid rgba(200,168,75,0.15)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            天乙贵人
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {shenShaAnalysis.tianYiGuiRen.branches.map((branch, i) => (
+              <span key={i} style={{
+                fontSize: 16,
+                color: '#f5e09a',
+                fontWeight: 500
+              }}>
+                {branch}
+              </span>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {shenShaAnalysis.tianYiGuiRen.description}
+          </div>
+        </div>
+      )}
+
+      {/* 月德月合 */}
+      {shenShaAnalysis.yueDeHe.yueDe.branch && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(200,168,75,0.03)',
+          border: '1px solid rgba(200,168,75,0.15)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            月德月合
+          </div>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)' }}>月德：</span>
+              <span style={{
+                fontSize: 16,
+                color: '#f5e09a',
+                fontWeight: 500,
+                marginLeft: 8
+              }}>
+                {shenShaAnalysis.yueDeHe.yueDe.branch}
+              </span>
+            </div>
+            <div>
+              <span style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)' }}>月合：</span>
+              <span style={{
+                fontSize: 16,
+                color: '#f5e09a',
+                fontWeight: 500,
+                marginLeft: 8
+              }}>
+                {shenShaAnalysis.yueDeHe.yueHe.branch}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 三奇六仪 */}
+      {(shenShaAnalysis.sanQiLiuYi.sanQi.active || shenShaAnalysis.sanQiLiuYi.liuYi.active) && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(200,168,75,0.03)',
+          border: '1px solid rgba(200,168,75,0.15)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            三奇六仪
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {shenShaAnalysis.sanQiLiuYi.sanQi.active && (
+              <div style={{
+                padding: '4px 12px',
+                background: 'rgba(76, 175, 80, 0.15)',
+                borderRadius: 4,
+                fontSize: 11,
+                color: '#4caf50'
+              }}>
+                三奇临身
+              </div>
+            )}
+            {shenShaAnalysis.sanQiLiuYi.liuYi.active && (
+              <div style={{
+                padding: '4px 12px',
+                background: 'rgba(255, 193, 7, 0.15)',
+                borderRadius: 4,
+                fontSize: 11,
+                color: '#ffc107'
+              }}>
+                六仪临身
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 驿马桃花华盖 */}
+      {(shenShaAnalysis.yiMaTaoHuaHuaGai.yiMa.branch ||
+        shenShaAnalysis.yiMaTaoHuaHuaGai.taoHua.branch ||
+        shenShaAnalysis.yiMaTaoHuaHuaGai.huaGai.branch) && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(200,168,75,0.03)',
+          border: '1px solid rgba(200,168,75,0.15)',
+          borderRadius: 4
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            驿马桃花华盖
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {shenShaAnalysis.yiMaTaoHuaHuaGai.yiMa.branch && (
+              <div>
+                <span style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)' }}>驿马：</span>
+                <span style={{
+                  fontSize: 16,
+                  color: '#4caf50',
+                  fontWeight: 500,
+                  marginLeft: 8
+                }}>
+                  {shenShaAnalysis.yiMaTaoHuaHuaGai.yiMa.branch}
+                </span>
+              </div>
+            )}
+            {shenShaAnalysis.yiMaTaoHuaHuaGai.taoHua.branch && (
+              <div>
+                <span style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)' }}>桃花：</span>
+                <span style={{
+                  fontSize: 16,
+                  color: '#e57373',
+                  fontWeight: 500,
+                  marginLeft: 8
+                }}>
+                  {shenShaAnalysis.yiMaTaoHuaHuaGai.taoHua.branch}
+                </span>
+              </div>
+            )}
+            {shenShaAnalysis.yiMaTaoHuaHuaGai.huaGai.branch && (
+              <div>
+                <span style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)' }}>华盖：</span>
+                <span style={{
+                  fontSize: 16,
+                  color: '#e57373',
+                  fontWeight: 500,
+                  marginLeft: 8
+                }}>
+                  {shenShaAnalysis.yiMaTaoHuaHuaGai.huaGai.branch}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Branch Relationships Display (地支关系显示)
+function BranchRelationshipsDisplay({ branchRelationships }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
+        地支关系
+      </div>
+
+      {/* 六合 */}
+      {branchRelationships.liuHe.length > 0 && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(76, 175, 80, 0.08)',
+          border: '1px solid rgba(76, 175, 80, 0.2)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            六合
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {branchRelationships.liuHe.map((r, i) => (
+              <div key={i} style={{
+                padding: '4px 12px',
+                background: 'rgba(76, 175, 80, 0.15)',
+                borderRadius: 4,
+                fontSize: 12,
+                color: '#4caf50'
+              }}>
+                {r.element}合
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.liuHe[0].description}
+          </div>
+        </div>
+      )}
+
+      {/* 六冲 */}
+      {branchRelationships.liuChong.length > 0 && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(211, 47, 47, 0.08)',
+          border: '1px solid rgba(211, 47, 47, 0.2)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            六冲
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {branchRelationships.liuChong.map((r, i) => (
+              <div key={i} style={{
+                padding: '4px 12px',
+                background: 'rgba(211, 47, 47, 0.15)',
+                borderRadius: 4,
+                fontSize: 12,
+                color: '#d32f2f'
+              }}>
+                冲
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.liuChong[0].description}
+          </div>
+        </div>
+      )}
+
+      {/* 三合 */}
+      {branchRelationships.sanHe?.active && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(76, 175, 80, 0.08)',
+          border: '1px solid rgba(76, 175, 80, 0.2)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            三合
+          </div>
+          <div style={{ padding: '4px 12px', background: 'rgba(76, 175, 80, 0.15)', borderRadius: 4, fontSize: 12, color: '#4caf50' }}>
+            {branchRelationships.sanHe.name}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.sanHe.description}
+          </div>
+        </div>
+      )}
+
+      {/* 三会 */}
+      {branchRelationships.sanHui?.active && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(76, 175, 80, 0.12)',
+          border: '1px solid rgba(76, 175, 80, 0.25)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            三会
+          </div>
+          <div style={{ padding: '4px 12px', background: 'rgba(76, 175, 80, 0.2)', borderRadius: 4, fontSize: 12, color: '#4caf50' }}>
+            {branchRelationships.sanHui.name}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.sanHui.description}
+          </div>
+        </div>
+      )}
+
+      {/* 方 */}
+      {branchRelationships.fang.length > 0 && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(76, 175, 80, 0.05)',
+          border: '1px solid rgba(76, 175, 80, 0.15)',
+          borderRadius: 4,
+          marginBottom: 12
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            方
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {branchRelationships.fang.map((r, i) => (
+              <div key={i} style={{
+                padding: '4px 12px',
+                background: 'rgba(76, 175, 80, 0.12)',
+                borderRadius: 4,
+                fontSize: 12,
+                color: '#4caf50'
+              }}>
+                {r.direction}方
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.fang[0].description}
+          </div>
+        </div>
+      )}
+
+      {/* 刑 */}
+      {branchRelationships.xing.length > 0 && (
+        <div style={{
+          padding: '16px',
+          background: 'rgba(211, 47, 47, 0.05)',
+          border: '1px solid rgba(211, 47, 47, 0.15)',
+          borderRadius: 4
+        }}>
+          <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+            刑
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {branchRelationships.xing.map((r, i) => (
+              <div key={i} style={{
+                padding: '4px 12px',
+                background: 'rgba(211, 47, 47, 0.12)',
+                borderRadius: 4,
+                fontSize: 12,
+                color: '#d32f2f'
+              }}>
+                {r.type}
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: GOLD + '0.7)', marginTop: 8 }}>
+            {branchRelationships.xing[0].description}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Element States Display (五行状态显示)
+function ElementStatesDisplay({ elementStates }) {
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
+        五行状态
+      </div>
+
+      {/* Season display */}
+      <div style={{
+        padding: '16px',
+        background: 'rgba(200,168,75,0.03)',
+        border: '1px solid rgba(200,168,75,0.15)',
+        borderRadius: 4,
+        marginBottom: 16,
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 8 }}>
+          季节
+        </div>
+        <div style={{ fontSize: 18, color: '#f5e09a', fontWeight: 500 }}>
+          {elementStates.season}
+        </div>
+      </div>
+
+      {/* Elements grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: 12,
+        marginBottom: 16
+      }}>
+        {Object.entries(elementStates.elements).map(([element, state]) => (
+          <div key={element} style={{
+            padding: '16px',
+            background: 'rgba(200,168,75,0.03)',
+            border: '1px solid rgba(200,168,75,0.1)',
+            borderRadius: 8,
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: 14,
+              color: '#f5e09a',
+              fontWeight: 500,
+              marginBottom: 8
+            }}>
+              {element}
+            </div>
+            <div style={{
+              padding: '4px 12px',
+              borderRadius: 4,
+              fontSize: 13,
+              fontWeight: 600,
+              marginBottom: 8,
+              ...getElementStateStyle(state.state)
+            }}>
+              {state.state}
+            </div>
+            <div style={{
+              fontSize: 9,
+              color: GOLD + '0.6)',
+              lineHeight: 1.6
+            }}>
+              {state.description}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Summary */}
+      <div style={{
+        padding: '16px',
+        background: 'rgba(200,168,75,0.03)',
+        border: '1px solid rgba(200,168,75,0.15)',
+        borderRadius: 4
+      }}>
+        <div style={{ fontSize: 10, color: 'rgba(200,168,75,0.5)', marginBottom: 12 }}>
+          状态摘要
+        </div>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          {elementStates.summary.wang && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, color: '#4caf50', fontWeight: 500 }}>
+                {elementStates.summary.wang}旺
+              </span>
+            </div>
+          )}
+          {elementStates.summary.xiang && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, color: '#81c784', fontWeight: 500 }}>
+                {elementStates.summary.xiang}相
+              </span>
+            </div>
+          )}
+          {elementStates.summary.xiu && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, color: '#ffc107', fontWeight: 500 }}>
+                {elementStates.summary.xiu}休
+              </span>
+            </div>
+          )}
+          {elementStates.summary.qiu && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, color: '#ff9800', fontWeight: 500 }}>
+                {elementStates.summary.qiu}囚
+              </span>
+            </div>
+          )}
+          {elementStates.summary.si && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 14, color: '#d32f2f', fontWeight: 500 }}>
+                {elementStates.summary.si}死
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Helper function to get element state styling
+function getElementStateStyle(state) {
+  const styles = {
+    旺: {
+      backgroundColor: 'rgba(76, 175, 80, 0.2)',
+      color: '#4caf50'
+    },
+    相: {
+      backgroundColor: 'rgba(129, 199, 132, 0.2)',
+      color: '#81c784'
+    },
+    休: {
+      backgroundColor: 'rgba(255, 193, 7, 0.2)',
+      color: '#ffc107'
+    },
+    囚: {
+      backgroundColor: 'rgba(255, 152, 0, 0.2)',
+      color: '#ff9800'
+    },
+    死: {
+      backgroundColor: 'rgba(211, 47, 47, 0.2)',
+      color: '#d32f2f'
+    }
+  };
+  return styles[state] || styles.休;
+}
+
 export default function Da6() {
   const { t } = useTranslation();
 
@@ -1951,6 +2790,15 @@ export default function Da6() {
 
           {/* Vacancies */}
           <VacanciesDisplay vacancies={result.vacancies} />
+
+          {/* Divine Spirits */}
+          <ShenShaDisplay shenShaAnalysis={result.shenShaAnalysis} />
+
+          {/* Branch Relationships */}
+          <BranchRelationshipsDisplay branchRelationships={result.branchRelationships} />
+
+          {/* Element States */}
+          <ElementStatesDisplay elementStates={result.elementStates} />
 
           {/* Overall Fortune Summary */}
           <div style={{
