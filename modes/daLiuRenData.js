@@ -160,19 +160,6 @@ export const SITUATIONS = {
 };
 
 // Vacancies (空亡) - for each heavenly stem
-export const VACANCIES = {
-  甲: { vacant: ['申', '酉'] },
-  乙: { vacant: ['午', '未'] },
-  丙: { vacant: ['辰', '巳'] },
-  丁: { vacant: ['寅', '卯'] },
-  戊: { vacant: ['子', '丑'] },
-  己: { vacant: ['申', '酉'] },
-  庚: { vacant: ['午', '未'] },
-  辛: { vacant: ['辰', '巳'] },
-  壬: { vacant: ['寅', '卯'] },
-  癸: { vacant: ['子', '丑'] }
-};
-
 // Transmission types
 export const TRANSMISSION_TYPES = {
   first: '初传',
@@ -254,18 +241,6 @@ export function getElementRelationship(element1, element2) {
 /**
  * Get vacancy information for a stem
  */
-export function getVacancyInfo(stem) {
-  return VACANCIES[stem] || { vacant: [] };
-}
-
-/**
- * Check if a branch is vacant for a given stem
- */
-export function isVacant(stem, branch) {
-  const info = getVacancyInfo(stem);
-  return info.vacant.includes(branch);
-}
-
 /**
  * Get general by position index
  */

@@ -5,7 +5,6 @@ import {
   ELEMENT_RELATIONSHIPS,
   TWELVE_GENERALS,
   SITUATIONS,
-  VACANCIES,
   TRANSMISSION_TYPES,
   CLASS_TYPES,
   BRANCH_ELEMENTS,
@@ -15,8 +14,6 @@ import {
   isGeneratingRelationship,
   isControllingRelationship,
   getElementRelationship,
-  getVacancyInfo,
-  isVacant,
   getGeneralByPosition,
   calculateBalanceScore,
   isElementsBalanced,
@@ -387,43 +384,42 @@ const YUE_JIANG = {
   '子将': { branch: '子', index: 0,  description: '大寒后起子将' }
 };
 
+// Precise solar term dates for different years (2024-2026)
+const SOLAR_TERMS_PRECISE = [
+  { name: '雨水', year2024: '02-19', year2025: '02-18', year2026: '02-18', yueJiang: '亥将' },
+  { name: '春分', year2024: '03-20', year2025: '03-20', year2026: '03-20', yueJiang: '戌将' },
+  { name: '谷雨', year2024: '04-19', year2025: '04-20', year2026: '04-19', yueJiang: '酉将' },
+  { name: '小满', year2024: '05-21', year2025: '05-21', year2026: '05-20', yueJiang: '申将' },
+  { name: '夏至', year2024: '06-21', year2025: '06-21', year2026: '06-21', yueJiang: '未将' },
+  { name: '大暑', year2024: '07-22', year2025: '07-22', year2026: '07-22', yueJiang: '午将' },
+  { name: '处暑', year2024: '08-22', year2025: '08-23', year2026: '08-23', yueJiang: '巳将' },
+  { name: '秋分', year2024: '09-22', year2025: '09-23', year2026: '09-22', yueJiang: '辰将' },
+  { name: '霜降', year2024: '10-23', year2025: '10-23', year2026: '10-23', yueJiang: '卯将' },
+  { name: '小雪', year2024: '11-22', year2025: '11-22', year2026: '11-22', yueJiang: '寅将' },
+  { name: '冬至', year2024: '12-21', year2025: '12-21', year2026: '12-21', yueJiang: '丑将' },
+  { name: '大寒', year2024: '01-20', year2025: '01-20', year2026: '01-20', yueJiang: '子将' }
+];
+
 // Determine 月将 based on date and solar term
 function determineYueJiang(year, month, day) {
-  // Simplified: use approximate solar term dates
-  // In a real implementation, you would calculate the exact solar term date
+  const dateObj = new Date(year, month - 1, day);
+  const dayOfYear = Math.floor((dateObj - new Date(year, 0, 1)) / (1000 * 60 * 60 * 24));
 
-  // Approximate mapping based on day of year
-  const date = new Date(year, month - 1, day);
-  const startOfYear = new Date(year, 0, 1);
-  const dayOfYear = Math.floor((date - startOfYear) / (1000 * 60 * 60 * 24));
+  for (const solarTerm of SOLAR_TERMS_PRECISE) {
+    const termDate = solarTerm[`year${year}`] || solarTerm.year2026;
+    const [termMonth, termDay] = termDate.split('-').map(Number);
+    const termDayOfYear = Math.floor((new Date(year, termMonth - 1, termDay) - new Date(year, 0, 1)) / (1000 * 60 * 60 * 24));
 
-  // Solar term thresholds (approximate, vary slightly each year)
-  const thresholds = [
-    { day: 49, yueJiang: '亥将' },  // After 雨水 (Feb 19)
-    { day: 80, yueJiang: '戌将' },  // After 春分 (Mar 21)
-    { day: 110, yueJiang: '酉将' }, // After 谷雨 (Apr 20)
-    { day: 141, yueJiang: '申将' }, // After 小满 (May 21)
-    { day: 172, yueJiang: '未将' }, // After 夏至 (Jun 21)
-    { day: 204, yueJiang: '午将' }, // After 大暑 (Jul 23)
-    { day: 235, yueJiang: '巳将' }, // After 处暑 (Aug 23)
-    { day: 266, yueJiang: '辰将' }, // After 秋分 (Sep 23)
-    { day: 296, yueJiang: '卯将' }, // After 霜降 (Oct 23)
-    { day: 326, yueJiang: '寅将' }, // After 小雪 (Nov 22)
-    { day: 356, yueJiang: '丑将' }, // After 冬至 (Dec 22)
-    { day: 366, yueJiang: '子将' }  // After 大寒 (Jan 20, next year)
-  ];
-
-  for (let i = 0; i < thresholds.length; i++) {
-    if (dayOfYear < thresholds[i].day) {
-      return YUE_JIANG[thresholds[i].yueJiang];
+    if (dayOfYear < termDayOfYear) {
+      return YUE_JIANG[solarTerm.yueJiang];
     }
   }
 
-  return YUE_JIANG['子将']; // Default
+  return YUE_JIANG['子将'];
 }
 
 // Calculate Three Transmissions (三傳) using traditional 九宗门 methods
-function calculateThreeTransmissions(stemBranch, classes, heavenPan, funMode) {
+function calculateThreeTransmissions(stemBranch, classes, heavenPan, generalsPan, funMode, isDay) {
   const { day } = stemBranch;
 
   if (funMode) {
@@ -474,8 +470,8 @@ function calculateThreeTransmissions(stemBranch, classes, heavenPan, funMode) {
     return yaoKeResult;
   }
 
-  // Fallback: use 昴星法/别责法/八专法
-  return tryFallbackMethod(classes, heavenPan, day);
+  // Fallback: use 八专法 > 别责法 > 昴星法
+  return tryFallbackMethod(classes, heavenPan, generalsPan, day, isDay, stemBranch);
 }
 
 // Find all 贼克 (lower controlling upper) classes
@@ -598,21 +594,96 @@ function tryYaoKeMethod(classes, heavenPan, day) {
   return null; // No 远克 found
 }
 
-// Fallback methods: 昴星法/别责法/八专法
-function tryFallbackMethod(classes, heavenPan, day) {
-  // 昴星法 - Use 酉上的天盘神 (upper spirit on 酉)
-  // This is a simplified implementation
-  const youIndex = EARTHLY_BRANCHES.indexOf('酉');
-  const maoIndex = EARTHLY_BRANCHES.indexOf('卯');
-  const youBranch = heavenPan['酉'].branch;
-  const maoBranch = heavenPan['卯'].branch;
+// Fallback methods: 八专法 > 别责法 > 昴星法
+function tryFallbackMethod(classes, heavenPan, generalsPan, day, isDay, stemBranch) {
+  // 优先级：八专法 > 别责法 > 昴星法
 
-  // Choose between 酉 and 卯 based on day/night or other factors
-  // Simplified: use 酉 for 昴星法
+  // 尝试八专法
+  const baZhuanResult = tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay);
+  if (baZhuanResult) {
+    return baZhuanResult;
+  }
+
+  // 尝试别责法
+  const bieZeResult = tryBieZeMethod(classes, heavenPan, generalsPan, day, isDay);
+  if (bieZeResult) {
+    return bieZeResult;
+  }
+
+  // 最后使用昴星法（带昼夜选择）
+  return tryMaoXingMethod(heavenPan, generalsPan, isDay);
+}
+
+// 八专法 - For 甲 or 己 days, use the upper spirit on day branch
+function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, day, isDay) {
+  // 检查日干是否为甲或己
+  if (day.stem !== '甲' && day.stem !== '己') {
+    return null;
+  }
+
+  // 八专法：取日支的上神
+  const dayBranchUpperSpirit = findUpperSpirit(heavenPan, day.branch);
   const firstTransmission = {
-    general: heavenPan['酉'].general,
-    element: heavenPan['酉'].general.element,
-    description: '昴星法：酉上神',
+    general: generalsPan ? generalsPan[dayBranchUpperSpirit.branch].general : null,
+    element: getBranchElement(dayBranchUpperSpirit.branch),
+    description: '八专法：日支上神',
+    type: TRANSMISSION_TYPES.first
+  };
+
+  const second = calculateNextTransmission(firstTransmission, heavenPan);
+  const third = calculateNextTransmission(second, heavenPan);
+
+  return {
+    first: firstTransmission,
+    second: second,
+    third: third
+  };
+}
+
+// 别责法 - When there are duplicate branches in the four classes
+function tryBieZeMethod(classes, heavenPan, generalsPan, day, isDay) {
+  // 检查是否有两个相同的地支
+  const branchCounts = {};
+  classes.forEach(cls => {
+    branchCounts[cls.branch] = (branchCounts[cls.branch] || 0) + 1;
+  });
+
+  const duplicateBranch = Object.keys(branchCounts).find(
+    branch => branchCounts[branch] >= 2
+  );
+
+  if (duplicateBranch) {
+    const duplicateBranchUpperSpirit = findUpperSpirit(heavenPan, duplicateBranch);
+    const firstTransmission = {
+      general: generalsPan ? generalsPan[duplicateBranchUpperSpirit.branch].general : null,
+      element: getBranchElement(duplicateBranchUpperSpirit.branch),
+      description: `别责法：${duplicateBranch}`,
+      type: TRANSMISSION_TYPES.first
+    };
+
+    const second = calculateNextTransmission(firstTransmission, heavenPan);
+    const third = calculateNextTransmission(second, heavenPan);
+
+    return {
+      first: firstTransmission,
+      second: second,
+      third: third
+    };
+  }
+
+  return null;
+}
+
+// 昴星法 - Use 酉 for daytime, 卯 for nighttime
+function tryMaoXingMethod(heavenPan, generalsPan, isDay) {
+  // 昴星法：昼取酉，夜取卯
+  const targetBranch = isDay ? '酉' : '卯';
+
+  const targetBranchUpperSpirit = findUpperSpirit(heavenPan, targetBranch);
+  const firstTransmission = {
+    general: generalsPan ? generalsPan[targetBranchUpperSpirit.branch].general : null,
+    element: getBranchElement(targetBranchUpperSpirit.branch),
+    description: `昴星法：${targetBranch}上神`,
     type: TRANSMISSION_TYPES.first
   };
 
@@ -636,13 +707,21 @@ function calculateHarmDepth(cls, heavenPan) {
   const upperBranch = heavenPan[cls.branch].branch;
   const upperIndex = EARTHLY_BRANCHES.indexOf(upperBranch);
 
-  // Count branches that are "harmed" (in the way of the control relationship)
+  // Calculate the branch element of the original branch
+  const branchElement = getBranchElement(cls.branch);
+
+  // Count branches that are controlling the original branch element along the path
   // Traditional method: trace from original branch to upper spirit, counting branches that would block
-  // Simplified: use the number of branches between them
-  if (upperIndex > branchIndex) {
-    depth = upperIndex - branchIndex;
-  } else {
-    depth = 12 - branchIndex + upperIndex;
+  let currentIndex = branchIndex;
+  while (currentIndex !== upperIndex) {
+    currentIndex = (currentIndex + 1) % 12;
+    const currentBranch = EARTHLY_BRANCHES[currentIndex];
+    const currentElement = getBranchElement(currentBranch);
+
+    // Check if this branch controls the original branch element
+    if (isControllingRelationship(currentElement, branchElement)) {
+      depth++;
+    }
   }
 
   return depth;
@@ -685,7 +764,7 @@ function calculateNextTransmission(currentTransmission, heavenPan) {
 }
 
 // Calculate Four Classes (四课) using traditional method
-function calculateFourClasses(stemBranch, heavenPan, funMode) {
+function calculateFourClasses(stemBranch, heavenPan, generalsPan, funMode) {
   const { day } = stemBranch;
 
   if (funMode) {
@@ -695,6 +774,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
         stem: day.stem,
         branch: EARTHLY_BRANCHES[(day.branchIndex + 3) % 12],
         element: '木',
+        general: generalsPan ? generalsPan[EARTHLY_BRANCHES[(day.branchIndex + 3) % 12]].general : null,
         relationship: '吉',
         type: CLASS_TYPES.first
       },
@@ -702,6 +782,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
         stem: day.stem,
         branch: EARTHLY_BRANCHES[(day.branchIndex + 6) % 12],
         element: '水',
+        general: generalsPan ? generalsPan[EARTHLY_BRANCHES[(day.branchIndex + 6) % 12]].general : null,
         relationship: '吉',
         type: CLASS_TYPES.second
       },
@@ -709,6 +790,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
         stem: day.stem,
         branch: EARTHLY_BRANCHES[(day.branchIndex + 9) % 12],
         element: '火',
+        general: generalsPan ? generalsPan[EARTHLY_BRANCHES[(day.branchIndex + 9) % 12]].general : null,
         relationship: '吉',
         type: CLASS_TYPES.third
       },
@@ -716,6 +798,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
         stem: day.stem,
         branch: EARTHLY_BRANCHES[day.branchIndex],
         element: getStemElement(day.stem),
+        general: generalsPan ? generalsPan[EARTHLY_BRANCHES[day.branchIndex]].general : null,
         relationship: '吉',
         type: CLASS_TYPES.fourth
       }
@@ -734,7 +817,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
     stem: day.stem,
     branch: firstClassUpperSpirit.branch,
     element: getBranchElement(firstClassUpperSpirit.branch),
-    general: firstClassUpperSpirit.general,
+    general: generalsPan ? generalsPan[firstClassUpperSpirit.branch].general : null,
     relationship: getElementRelationship(getStemElement(day.stem), getBranchElement(firstClassUpperSpirit.branch)),
     type: CLASS_TYPES.first,
     jiGong: jiGongBranch
@@ -747,7 +830,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
     stem: day.stem,
     branch: secondClassUpperSpirit.branch,
     element: getBranchElement(secondClassUpperSpirit.branch),
-    general: secondClassUpperSpirit.general,
+    general: generalsPan ? generalsPan[secondClassUpperSpirit.branch].general : null,
     relationship: getElementRelationship(getStemElement(day.stem), getBranchElement(secondClassUpperSpirit.branch)),
     type: CLASS_TYPES.second
   };
@@ -759,7 +842,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
     stem: day.stem,
     branch: thirdClassUpperSpirit.branch,
     element: getBranchElement(thirdClassUpperSpirit.branch),
-    general: thirdClassUpperSpirit.general,
+    general: generalsPan ? generalsPan[thirdClassUpperSpirit.branch].general : null,
     relationship: getElementRelationship(getStemElement(day.stem), getBranchElement(thirdClassUpperSpirit.branch)),
     type: CLASS_TYPES.third
   };
@@ -771,7 +854,7 @@ function calculateFourClasses(stemBranch, heavenPan, funMode) {
     stem: day.stem,
     branch: fourthClassUpperSpirit.branch,
     element: getBranchElement(fourthClassUpperSpirit.branch),
-    general: fourthClassUpperSpirit.general,
+    general: generalsPan ? generalsPan[fourthClassUpperSpirit.branch].general : null,
     relationship: getElementRelationship(getStemElement(day.stem), getBranchElement(fourthClassUpperSpirit.branch)),
     type: CLASS_TYPES.fourth
   };
@@ -824,8 +907,8 @@ function calculateHeavenPan(stemBranch, year, month, day, hour) {
   const heavenPan = {};
   EARTHLY_BRANCHES.forEach((branch, index) => {
     const rotatedIndex = (index + baseRotation) % 12;
+    // 修改：只返回天盤地支，不包含天将
     heavenPan[branch] = {
-      general: TWELVE_GENERALS[rotatedIndex],
       position: rotatedIndex,
       branch: EARTHLY_BRANCHES[rotatedIndex]
     };
@@ -834,11 +917,33 @@ function calculateHeavenPan(stemBranch, year, month, day, hour) {
   return heavenPan;
 }
 
+// Calculate Twelve Heavenly Generals Pan (十二天将盘)
+function calculateGeneralsPan(dayStem, isDay) {
+  const guiRenBranch = getGuiRenPosition(dayStem, isDay);
+  const guiRenIndex = EARTHLY_BRANCHES.indexOf(guiRenBranch);
+
+  const generalPlacement = {};
+  EARTHLY_BRANCHES.forEach((branch, index) => {
+    // 昼占：顺时针；夜占：逆时针
+    const relativeIndex = isDay
+      ? (index - guiRenIndex + 12) % 12
+      : (guiRenIndex - index + 12) % 12;
+
+    generalPlacement[branch] = {
+      general: TWELVE_GENERALS[relativeIndex],
+      position: relativeIndex,
+      isGuiRen: relativeIndex === 0
+    };
+  });
+
+  return generalPlacement;
+}
+
 // Find 上神 (upper spirit) on heaven pan for a given branch
+// Modified: Only returns branch from heavenPan, general should come from generalsPan
 function findUpperSpirit(heavenPan, branch) {
   const heavenData = heavenPan[branch];
   return {
-    general: heavenData.general,
     branch: heavenData.branch
   };
 }
@@ -865,17 +970,6 @@ function calculateVacancies(dayStemIndex, dayBranchIndex) {
 }
 
 // Legacy version for backward compatibility
-function calculateVacanciesLegacy(dayStemIndex) {
-  const stem = HEAVENLY_STEMS[dayStemIndex];
-  const vacancyInfo = getVacancyInfo(stem);
-  return {
-    stem: stem,
-    stemIndex: dayStemIndex,
-    vacantBranches: vacancyInfo.vacant,
-    description: `天干${stem}对应空亡地支：${vacancyInfo.vacant.join('、')}`
-  };
-}
-
 // Calculate Situation (局)
 function calculateSituation(stemBranch) {
   const { day, month } = stemBranch;
@@ -1071,11 +1165,17 @@ function calculateDa6Full(year, month, day, hour, funMode) {
   // Calculate Heaven Pan (with 月将加时) - needed before Four Classes
   const heavenPan = calculateHeavenPan(pillars, year, month, day, hour);
 
-  // Calculate Four Classes (needs heavenPan)
-  const classes = calculateFourClasses(pillars, heavenPan, funMode);
+  // Determine if it's day or night
+  const isDay = isDaytime(hour);
 
-  // Calculate Three Transmissions (needs classes and heavenPan)
-  const transmissions = calculateThreeTransmissions(pillars, classes, heavenPan, funMode);
+  // Calculate Twelve Heavenly Generals Pan (十二天将盘) - separated from Heaven Pan
+  const generalsPan = calculateGeneralsPan(pillars.day.stem, isDay);
+
+  // Calculate Four Classes (needs heavenPan and generalsPan)
+  const classes = calculateFourClasses(pillars, heavenPan, generalsPan, funMode);
+
+  // Calculate Three Transmissions (needs classes, heavenPan, and generalsPan)
+  const transmissions = calculateThreeTransmissions(pillars, classes, heavenPan, generalsPan, funMode, isDay);
 
   // Calculate Earth Pan
   const earthPan = calculateEarthPan();
@@ -1092,14 +1192,12 @@ function calculateDa6Full(year, month, day, hour, funMode) {
   // Calculate overall fortune
   const overallFortune = calculateOverallFortune(transmissions, classes, elementAnalysis);
 
-  // Determine if it's day or night
-  const isDay = isDaytime(hour);
-
   return {
     pillars,
     transmissions,
     classes,
     heavenPan,
+    generalsPan,
     earthPan,
     vacancies,
     situation,
