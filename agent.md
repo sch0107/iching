@@ -45,7 +45,8 @@ This is a traditional Chinese divination web application built with React + Vite
 │   ├── CoinToss.jsx     # Coin toss divination
 │   ├── XiaoLiuRen.jsx  # Xiao Liu Ren (six spirits)
 │   ├── MeiHua.jsx       # Mei Hua Yi Shu
-│   ├── Da6.jsx          # Da Liu Ren (Ba Zi)
+│   ├── Da6.jsx          # Da Liu Ren (Ba Zi) - Full 三傳四課天盤地盤 system
+│   ├── daLiuRenData.js # Da Liu Ren data structures - Twelve Generals, Five Elements, Vacancies, etc.
 │   ├── Tarot.jsx        # Tarot card divination
 │   └── tarotData.js     # 78-card structure + Fisher-Yates shuffle
 └── locales/
@@ -124,7 +125,18 @@ function MyComponent() {
 
 ### Da Liu Ren (大六壬)
 - Requires birth date/time input (Ba Zi - 8 pillars)
-- Simplified version of traditional Da Liu Ren calculation
+- **Full implementation** of traditional Da Liu Ren system, one of China's Three Styles (三式)
+- **三傳 (Three Transmissions)**: First, second, and third transmissions based on day and month branches
+- **四課 (Four Classes)**: Four classes derived from day stem with element analysis
+- **天盤地盤 (Heaven & Earth Pans)**: Rotating heaven pan based on month, fixed earth pan
+- **五行分析 (Five Elements Analysis)**: Complete analysis of generating and controlling relationships, element balance
+- **空亡 (Vacancies)**: Empty branches determined by day stem
+- **局 (Situations)**: Upper, middle, or lower situation based on day/month relationship
+- **十二将 (Twelve Generals)**: 贵人, 螣蛇, 朱雀, 六合, 勾陈, 青龙, 天空, 白虎, 太常, 玄武, 太阴, 天后
+- **综合卦象 (Overall Fortune)**: Comprehensive fortune scoring (大吉, 吉, 平, 凶, 大凶)
+- **日占/夜占 (Day/Night Divination)**: Different calculations for daytime (7am-7pm) vs nighttime
+- Traditional calendar-based stem-branch calculations
+- Data structures in `modes/daLiuRenData.js`
 
 ### Tarot (塔罗牌)
 - 78 cards: 22 Major Arcana + 56 Minor Arcana (4 suits × 14)
