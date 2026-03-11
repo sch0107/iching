@@ -215,19 +215,36 @@ export default function Tarot() {
           </div>
 
           {/* Fun mode toggle */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, gap: 12 }}>
             <span style={{ fontSize: 11, letterSpacing: 2, color: GOLD + "0.6)" }}>
               {t("tarot.funMode.label")}
             </span>
-            <button onClick={() => setFunMode(!funMode)} style={{
-              background: funMode ? GOLD + "0.15)" : "none",
-              border: `1px solid ${funMode ? GOLD + "0.5)" : GOLD + "0.2)"}`,
-              color: funMode ? "#f5e09a" : GOLD + "0.5)",
-              padding: "6px 18px", fontSize: 12, letterSpacing: 2,
-              cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
-            }}>
-              {funMode ? t("tarot.funMode.on") : t("tarot.funMode.off")}
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button
+                onClick={() => setFunMode(false)}
+                style={{
+                  background: !funMode ? GOLD + "0.18)" : "none",
+                  border: `1px solid ${!funMode ? GOLD + "0.5)" : GOLD + "0.3)"}`,
+                  color: !funMode ? "#f5e09a" : GOLD + "0.5)",
+                  padding: "6px 14px", fontSize: 11, letterSpacing: 2,
+                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", borderRadius: 4,
+                }}
+              >
+                OFF
+              </button>
+              <button
+                onClick={() => setFunMode(true)}
+                style={{
+                  background: funMode ? GOLD + "0.18)" : "none",
+                  border: `1px solid ${funMode ? GOLD + "0.5)" : GOLD + "0.3)"}`,
+                  color: funMode ? "#f5e09a" : GOLD + "0.5)",
+                  padding: "6px 14px", fontSize: 11, letterSpacing: 2,
+                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", borderRadius: 4,
+                }}
+              >
+                ON
+              </button>
+            </div>
           </div>
 
           {/* Question input */}
