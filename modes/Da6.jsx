@@ -83,10 +83,13 @@ function calculateStemBranchTraditional(year, month, day, hour) {
   const yearStemIndex = sexagenaryYear % 10;
   const yearBranchIndex = sexagenaryYear % 12;
 
-  // Month stem: traditional method (Year Stem + 1 mod 10 for first month)
-  // First lunar month is 寅月
-  const monthStemIndex = (yearStemIndex * 2 + (month - 1)) % 10;
-  const monthBranchIndex = (month + 1) % 12; // 寅 is first lunar month
+  // Month stem: traditional 五虎遁 method
+  // First lunar month is 寅月 (month + 1)
+  // Formula: 甲己之年丙作首, 乙庚之年戊为头, 丙辛之年庚为上, 丁壬之年壬为居, 戊癸之年甲为魁
+  // Simplified: (yearStem * 2 + (month + 1)) % 10
+  // For 甲年(stemIndex=0) 正月: (0 * 2 + 2) % 10 = 2 = 丙, correct
+  const monthBranchIndex = (month + 1) % 12; // 正月=寅月 (index 2)
+  const monthStemIndex = (yearStemIndex * 2 + monthBranchIndex) % 10;
 
   // Day stem and branch (simplified calculation)
   // Note: Accurate day calculation requires reference to a known date
@@ -230,37 +233,44 @@ function calculateRelativesLegacy(god) {
 }
 
 // 寄宫 - Day stem's temporary residence branch
+// 正确的十干寄宫: 甲→寅、乙→辰、丙→巳、丁→未、戊→巳、己→未、庚→申、辛→戌、壬→亥、癸→丑
 function getJiGong(dayStem) {
   const jiGongMap = {
-    '甲': '丑', '己': '丑',  // 甲己寄丑
-    '乙': '子', '庚': '子',  // 乙庚寄子
-    '丙': '寅', '辛': '寅',  // 丙辛寄寅
-    '丁': '卯', '壬': '卯',  // 丁壬寄卯
-    '戊': '辰', '癸': '辰'   // 戊癸寄辰
+    '甲': '寅',  // 甲寄寅
+    '乙': '辰',  // 乙寄辰
+    '丙': '巳',  // 丙寄巳
+    '丁': '未',  // 丁寄未
+    '戊': '巳',  // 戊寄巳
+    '己': '未',  // 己寄未
+    '庚': '申',  // 庚寄申
+    '辛': '戌',  // 辛寄戌
+    '壬': '亥',  // 壬寄亥
+    '癸': '丑'   // 癸寄丑
   };
-  return jiGongMap[dayStem] || '丑';
+  return jiGongMap[dayStem] || '寅';
 }
 
 // Get 贵人 position based on day stem
+// 昼贵人: 甲戊庚牛羊，乙己鼠猴乡，丙丁猪鸡位，六辛逢马虎，壬癸蛇兔藏
+// 夜贵人: 乙己夜贵→申，丙丁夜贵→酉，壬癸夜贵→卯，辛夜贵→寅，甲戊庚夜贵同昼
 function getGuiRenPosition(dayStem, isDay) {
   const guiRenDayMap = {
-    '甲': '丑', '戊': '丑', '庚': '丑',  // 甲戊庚: 贵人在丑 (daytime)
-    '乙': '子', '己': '子',              // 乙己: 贵人在子 (daytime)
-    '丙': '亥', '丁': '亥',              // 丙丁: 贵人在亥 (daytime)
-    '壬': '卯', '癸': '卯',              // 壬癸: 贵人在卯 (daytime)
-    '辛': '寅'                           // 辛: 贵人在寅 (daytime)
+    '甲': '丑', '戊': '丑', '庚': '丑',  // 甲戊庚: 贵人在丑 (daytime) - 牛羊
+    '乙': '子', '己': '子',              // 乙己: 贵人在子 (daytime) - 鼠猴
+    '丙': '亥', '丁': '亥',              // 丙丁: 贵人在亥 (daytime) - 猪鸡
+    '壬': '巳', '癸': '巳',              // 壬癸: 贵人在巳 (daytime) - 蛇兔
+    '辛': '午'                           // 辛: 贵人在午 (daytime) - 马虎
   };
 
-  const oppositeBranchMap = {
-    '子': '午', '丑': '未', '寅': '申', '卯': '酉',
-    '辰': '戌', '巳': '亥', '午': '子', '未': '丑',
-    '申': '寅', '酉': '卯', '戌': '辰', '亥': '巳'
+  // 夜贵人 - not just opposite of daytime贵人
+  const guiRenNightMap = {
+    '甲': '丑', '乙': '申', '丙': '酉', '丁': '酉',
+    '戊': '丑', '己': '申', '庚': '丑',
+    '壬': '卯', '癸': '卯', '辛': '寅'
   };
 
-  const dayPosition = guiRenDayMap[dayStem] || '丑';
-
-  // For nighttime, use opposite branch
-  return isDay ? dayPosition : oppositeBranchMap[dayPosition];
+  const map = isDay ? guiRenDayMap : guiRenNightMap;
+  return map[dayStem] || '丑';
 }
 
 // Place all twelve generals based on 贵人 position
@@ -442,19 +452,23 @@ function calculateThreeTransmissions(stemBranch, classes, heavenPan, funMode) {
   }
 
   // Traditional method using 九宗门
-  // First, try 贼克法
-  const zeiKeResult = tryZeiKeMethod(classes, heavenPan, day);
-  if (zeiKeResult) {
-    return zeiKeResult;
+  // First, check for 贼克 (lower controlling upper)
+  const zeiKeClasses = findZeiKeClasses(classes, heavenPan);
+
+  // If only one 贼克, use 贼克法 directly
+  if (zeiKeClasses.length === 1) {
+    return useZeiKeMethod(zeiKeClasses[0], heavenPan, day);
   }
 
-  // Second, try 涉害法
-  const sheHaiResult = trySheHaiMethod(classes, heavenPan, day);
-  if (sheHaiResult) {
-    return sheHaiResult;
+  // If multiple 贼克, use 涉害法 to compare depth
+  if (zeiKeClasses.length > 1) {
+    const sheHaiResult = trySheHaiMethod(zeiKeClasses, heavenPan, day);
+    if (sheHaiResult) {
+      return sheHaiResult;
+    }
   }
 
-  // Third, try 遥克法
+  // If no 贼克, try 遥克法
   const yaoKeResult = tryYaoKeMethod(classes, heavenPan, day);
   if (yaoKeResult) {
     return yaoKeResult;
@@ -464,47 +478,16 @@ function calculateThreeTransmissions(stemBranch, classes, heavenPan, funMode) {
   return tryFallbackMethod(classes, heavenPan, day);
 }
 
-// 贼克法 - Check for lower controlling upper
-function tryZeiKeMethod(classes, heavenPan, day) {
+// Find all 贼克 (lower controlling upper) classes
+function findZeiKeClasses(classes, heavenPan) {
+  const zeiKeClasses = [];
+
   for (let i = 0; i < classes.length; i++) {
     const cls = classes[i];
     const stemElement = getStemElement(cls.stem);
     const branchElement = getBranchElement(cls.branch);
 
     // Check if lower (branch element) controls upper (stem element) - "下贼上"
-    if (isControllingRelationship(branchElement, stemElement)) {
-      // Found 贼克, use this as first transmission
-      const firstTransmission = {
-        general: cls.general,
-        element: cls.element,
-        description: `贼克法：${cls.stem}${cls.branch}，下克上`,
-        type: TRANSMISSION_TYPES.first
-      };
-
-      // Calculate second and third transmissions
-      const second = calculateNextTransmission(firstTransmission, heavenPan);
-      const third = calculateNextTransmission(second, heavenPan);
-
-      return {
-        first: firstTransmission,
-        second: second,
-        third: third
-      };
-    }
-  }
-
-  return null; // No 贼克 found
-}
-
-// 涉害法 - Compare depth of harm when multiple 贼克
-function trySheHaiMethod(classes, heavenPan, day) {
-  // Collect all classes with 贼克
-  const zeiKeClasses = [];
-  for (let i = 0; i < classes.length; i++) {
-    const cls = classes[i];
-    const stemElement = getStemElement(cls.stem);
-    const branchElement = getBranchElement(cls.branch);
-
     if (isControllingRelationship(branchElement, stemElement)) {
       zeiKeClasses.push({
         class: cls,
@@ -513,6 +496,31 @@ function trySheHaiMethod(classes, heavenPan, day) {
     }
   }
 
+  return zeiKeClasses;
+}
+
+// Use 贼克法 when only one 贼克 exists
+function useZeiKeMethod(zeiKeClass, heavenPan, day) {
+  const firstTransmission = {
+    general: zeiKeClass.class.general,
+    element: zeiKeClass.class.element,
+    description: `贼克法：${zeiKeClass.class.stem}${zeiKeClass.class.branch}，下克上`,
+    type: TRANSMISSION_TYPES.first
+  };
+
+  // Calculate second and third transmissions
+  const second = calculateNextTransmission(firstTransmission, heavenPan);
+  const third = calculateNextTransmission(second, heavenPan);
+
+  return {
+    first: firstTransmission,
+    second: second,
+    third: third
+  };
+}
+
+// 涉害法 - Compare depth of harm when multiple 贼克
+function trySheHaiMethod(zeiKeClasses, heavenPan, day) {
   if (zeiKeClasses.length === 0) {
     return null; // No 贼克 found
   }
@@ -524,7 +532,7 @@ function trySheHaiMethod(classes, heavenPan, day) {
   const firstTransmission = {
     general: selected.general,
     element: selected.element,
-    description: `涉害法：${selected.stem}${selected.branch}，最深`,
+    description: `涉害法：${selected.stem}${selected.branch}，最深涉害`,
     type: TRANSMISSION_TYPES.first
   };
 
@@ -538,16 +546,17 @@ function trySheHaiMethod(classes, heavenPan, day) {
   };
 }
 
-// 遥克法 - Check for distant control
+// 遥克法 - Check for distant control when no internal 贼克
 function tryYaoKeMethod(classes, heavenPan, day) {
   // Check for 远克 between day stem and branches
+  // Priority: day stem controls branch > branch controls day stem
   const dayStemElement = getStemElement(day.stem);
 
   for (let i = 0; i < classes.length; i++) {
     const cls = classes[i];
     const branchElement = getBranchElement(cls.branch);
 
-    // Check if day stem controls branch (远克)
+    // First priority: day stem controls branch (远克 - 日克支)
     if (isControllingRelationship(dayStemElement, branchElement)) {
       const firstTransmission = {
         general: cls.general,
@@ -566,7 +575,7 @@ function tryYaoKeMethod(classes, heavenPan, day) {
       };
     }
 
-    // Check if branch controls day stem (远克)
+    // Second priority: branch controls day stem (远克 - 支克日)
     if (isControllingRelationship(branchElement, dayStemElement)) {
       const firstTransmission = {
         general: cls.general,
@@ -591,11 +600,19 @@ function tryYaoKeMethod(classes, heavenPan, day) {
 
 // Fallback methods: 昴星法/别责法/八专法
 function tryFallbackMethod(classes, heavenPan, day) {
-  // 昴星法 - Use day branch's upper spirit
+  // 昴星法 - Use 酉上的天盘神 (upper spirit on 酉)
+  // This is a simplified implementation
+  const youIndex = EARTHLY_BRANCHES.indexOf('酉');
+  const maoIndex = EARTHLY_BRANCHES.indexOf('卯');
+  const youBranch = heavenPan['酉'].branch;
+  const maoBranch = heavenPan['卯'].branch;
+
+  // Choose between 酉 and 卯 based on day/night or other factors
+  // Simplified: use 酉 for 昴星法
   const firstTransmission = {
-    general: heavenPan[day.branch].general,
-    element: heavenPan[day.branch].general.element,
-    description: '昴星法：日干寄宫之上神',
+    general: heavenPan['酉'].general,
+    element: heavenPan['酉'].general.element,
+    description: '昴星法：酉上神',
     type: TRANSMISSION_TYPES.first
   };
 
@@ -611,16 +628,22 @@ function tryFallbackMethod(classes, heavenPan, day) {
 
 // Calculate harm depth for 涉害法
 function calculateHarmDepth(cls, heavenPan) {
-  // Simplified depth calculation
-  // In traditional method, this would trace the path through the heaven pan
+  // Traditional 涉害法 depth calculation: count the number of "harmed" branches
+  // between the original branch and its upper spirit on the heaven pan
   let depth = 0;
 
-  // Count the number of branches between the class branch and its upper spirit
   const branchIndex = EARTHLY_BRANCHES.indexOf(cls.branch);
   const upperBranch = heavenPan[cls.branch].branch;
   const upperIndex = EARTHLY_BRANCHES.indexOf(upperBranch);
 
-  depth = (upperIndex - branchIndex + 12) % 12;
+  // Count branches that are "harmed" (in the way of the control relationship)
+  // Traditional method: trace from original branch to upper spirit, counting branches that would block
+  // Simplified: use the number of branches between them
+  if (upperIndex > branchIndex) {
+    depth = upperIndex - branchIndex;
+  } else {
+    depth = 12 - branchIndex + upperIndex;
+  }
 
   return depth;
 }
@@ -783,7 +806,7 @@ function calculateSingleClass(day, month, classIndex) {
 
 // Calculate Heaven Pan (天盤) positions using 月将加时 method
 function calculateHeavenPan(stemBranch, year, month, day, hour) {
-  const { month: monthPillar, hour: hourPillar } = stemBranch;
+  const { hour: hourPillar } = stemBranch;
 
   // Determine 月将 based on solar term
   const yueJiang = determineYueJiang(year, month, day);
@@ -792,9 +815,11 @@ function calculateHeavenPan(stemBranch, year, month, day, hour) {
   // Hour branch index (0-11)
   const hourBranchIndex = hourPillar.branchIndex;
 
-  // 月将加时: add 月将 to hour branch to determine rotation
+  // 月将加时: 月将落在时支的位置上
+  // 比如月将=亥(11)、时支=子(0)，天盘子位应该是亥
   // The heaven pan rotates so that the 月将 branch aligns with the hour branch
-  const baseRotation = (hourBranchIndex - yueJiangBranchIndex + 12) % 12;
+  // baseRotation should make heavenPan[时支] contain 月将
+  const baseRotation = (yueJiangBranchIndex - hourBranchIndex + 12) % 12;
 
   const heavenPan = {};
   EARTHLY_BRANCHES.forEach((branch, index) => {
