@@ -45,8 +45,26 @@ This is a traditional Chinese divination web application built with React + Vite
 │   ├── CoinToss.jsx     # Coin toss divination
 │   ├── XiaoLiuRen.jsx  # Xiao Liu Ren (six spirits)
 │   ├── MeiHua.jsx       # Mei Hua Yi Shu
-│   ├── Da6.jsx          # Da Liu Ren (Ba Zi) - Full 三傳四課天盤地盤 system
-│   ├── daLiuRenData.js # Da Liu Ren data structures - Twelve Generals, Five Elements, Vacancies, etc.
+│   ├── daLiuRen/        # Da Liu Ren (Ba Zi) - Modular architecture
+│   │   ├── index.jsx    # Entry point, exports Da6 component
+│   │   ├── Da6.jsx      # Main component with UI and state management
+│   │   ├── data.js      # Data structures
+│   │   ├── calculations/# Calculation logic modules
+│   │   │   ├── index.js
+│   │   │   ├── threeTransmissions.js    # 三傳 (Nine Schools of Method)
+│   │   │   ├── fourClasses.js           # 四課
+│   │   │   ├── divineSpirits.js         # 神煞
+│   │   │   ├── heavenPan.js             # 天盘
+│   │   │   ├── twelveGenerals.js        # 十二将
+│   │   │   ├── stemBranch.js            # 干支系统
+│   │   │   ├── yueJiang.js              # 月将
+│   │   │   ├── elementStates.js         # 五行
+│   │   │   ├── branchRelationships.js   # 地支关系
+│   │   │   ├── calculateDa6Full.js      # Complete calculation pipeline
+│   │   │   └── utilities.js             # Utility functions
+│   │   └── components/# UI components
+│   │       ├── index.js
+│   │       └── Pillar.jsx               # Pillar visualization component
 │   ├── Tarot.jsx        # Tarot card divination
 │   └── tarotData.js     # 78-card structure + Fisher-Yates shuffle
 └── locales/

@@ -6,7 +6,7 @@ import CoinToss from "./modes/CoinToss.jsx";
 import XiaoLiuRen from "./modes/XiaoLiuRen.jsx";
 import MeiHua from "./modes/MeiHua.jsx";
 import Tarot from "./modes/Tarot.jsx";
-import Da6 from "./modes/Da6.jsx";
+import { Da6 } from "./modes/daLiuRen";
 
 const LANGS = [
   { code: "zh-Hans", label: "简" },

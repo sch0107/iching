@@ -116,9 +116,27 @@
 │   ├── CoinToss.jsx     # 铜钱占卜
 │   ├── XiaoLiuRen.jsx  # 小六壬（含时区选择）
 │   ├── MeiHua.jsx       # 梅花易术（含时区选择）
-│   ├── Da6.jsx          # 大六壬（生辰八字）- 完整三傳四課天盤地盤体系
-│   ├── daLiuRenData.js # 大六壬数据结构 - 十二将、五行、空亡、局等
-│   └── Tarot.jsx        # 塔罗牌占卜
+│   ├── daLiuRen/        # 大六壬（生辰八字）- 模块化架构
+│   │   ├── index.jsx    # 入口文件，导出 Da6 组件
+│   │   ├── Da6.jsx      # 主组件，包含 UI 和状态管理
+│   │   ├── data.js      # 数据结构
+│   │   ├── calculations/# 计算逻辑模块
+│   │   │   ├── index.js
+│   │   │   ├── threeTransmissions.js    # 三傳计算（九宗门）
+│   │   │   ├── fourClasses.js           # 四課计算
+│   │   │   ├── divineSpirits.js         # 神煞计算
+│   │   │   ├── heavenPan.js             # 天盘计算
+│   │   │   ├── twelveGenerals.js        # 十二将
+│   │   │   ├── stemBranch.js            # 干支系统
+│   │   │   ├── yueJiang.js              # 月将计算
+│   │   │   ├── elementStates.js         # 五行状态
+│   │   │   ├── branchRelationships.js   # 地支关系
+│   │   │   ├── calculateDa6Full.js      # 完整计算流程
+│   │   │   └── utilities.js             # 工具函数
+│   │   └── components/# UI 组件
+│   │       ├── index.js
+│   │       └── Pillar.jsx               # 柱状图组件
+│   ├── Tarot.jsx        # 塔罗牌占卜
 │   └── tarotData.js     # 78 张牌结构数据 + Fisher-Yates 洗牌
 └── locales/
     ├── en.json          # 英文：界面文字 + 六十四卦 + 八卦 + 六壬神
