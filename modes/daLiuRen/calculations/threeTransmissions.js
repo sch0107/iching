@@ -63,7 +63,7 @@ export function calculateThreeTransmissions(stemBranch, classes, heavenPan, gene
     return yaoKeResult;
   }
 
-  // Fallback: use 八专法 > 别责法 > 昴星法
+  // Fallback: use 昴星法 > 别责法 > 八专法
   return tryFallbackMethod(classes, heavenPan, generalsPan, stemBranch, isDay);
 }
 
@@ -188,33 +188,65 @@ function tryYaoKeMethod(classes, heavenPan, generalsPan, day) {
   return null; // No 远克 found
 }
 
-// Fallback methods: 八专法 > 别责法 > 昴星法
+// Fallback methods: 昴星法 > 别责法 > 八专法
 function tryFallbackMethod(classes, heavenPan, generalsPan, stemBranch, isDay) {
-  // 优先级：八专法 > 别责法 > 昴星法
+  // 优先级：昴星法 > 别责法 > 八专法
 
-  // 尝试八专法
-  const baZhuanResult = tryBaZhuanMethod(stemBranch, heavenPan, generalsPan);
-  if (baZhuanResult) {
-    return baZhuanResult;
+  // 1. 尝试昴星法
+  const maoXingResult = tryMaoXingMethod(heavenPan, generalsPan, isDay);
+  if (maoXingResult) {
+    return maoXingResult;
   }
 
-  // 尝试别责法
-  const bieZeResult = tryBieZeMethod(classes, heavenPan, generalsPan);
+  // 2. 尝试别责法
+  const bieZeResult = tryBieZeMethod(classes, heavenPan, generalsPan, stemBranch);
   if (bieZeResult) {
     return bieZeResult;
   }
 
-  // 最后使用昴星法（带昼夜选择）
-  return tryMaoXingMethod(heavenPan, generalsPan, isDay);
+  // 3. 最后使用八专法
+  return tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, classes);
 }
 
-// 八专法 - For 甲 or 己 days, use the upper spirit on day branch
-function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan) {
+// Check Ba Zhuan (八专法) condition
+// 八专法 triggers when all four classes share the same branch (四课俱同干)
+function checkBaZhuanCondition(classes, heavenPan, stemBranch) {
+  // Check if all four classes share the same branch (四课俱同干)
+  const branchElements = classes.map(cls => cls.branch);
+  const firstBranch = branchElements[0];
+  const allSame = branchElements.every(branch => branch === firstBranch);
+
+  if (allSame) {
+    return true;
+  }
+
+  // Traditional 八专 cases: specific day configurations where
+  // the upper spirits align (all point to same branch)
+  // This happens when 天盘地支分布符合八专条件
   const { day } = stemBranch;
-  // 检查日干是否为甲或己
-  if (day.stem !== '甲' && day.stem !== '己') {
+  const baZhuanDayStems = ['甲', '己'];
+
+  if (!baZhuanDayStems.includes(day.stem)) {
+    return false;
+  }
+
+  // Verify that the upper spirits align (all point to same branch)
+  // 八专法要求四课上神相同或特定天盘分布
+  const upperSpirits = classes.map(cls => findUpperSpirit(heavenPan, cls.branch).branch);
+  const firstUpper = upperSpirits[0];
+  const allUpperSame = upperSpirits.every(branch => branch === firstUpper);
+
+  return allUpperSame;
+}
+
+// 八专法 - For 甲 or 己 days with all classes sharing same branch, use the upper spirit on day branch
+function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan, classes) {
+  // Check 八专 condition
+  if (!checkBaZhuanCondition(classes, heavenPan, stemBranch)) {
     return null;
   }
+
+  const { day } = stemBranch;
 
   // 八专法：取日支的上神
   const dayBranchUpperSpirit = findUpperSpirit(heavenPan, day.branch);
@@ -235,38 +267,64 @@ function tryBaZhuanMethod(stemBranch, heavenPan, generalsPan) {
   };
 }
 
-// 别责法 - When there are duplicate branches in the four classes
-function tryBieZeMethod(classes, heavenPan, generalsPan) {
-  // 检查是否有两个相同的地支
-  const branchCounts = {};
-  classes.forEach(cls => {
-    branchCounts[cls.branch] = (branchCounts[cls.branch] || 0) + 1;
-  });
+// Check Bie Ze (别责法) condition
+// 别责法 triggers for specific day stem-branch combinations:
+// 甲未、乙辰、丙戌、丁丑、己辰、庚戌、辛未、壬丑、癸辰
+// OR when 三传重复 (all three transmissions identical)
+function checkBieZeCondition(classes, stemBranch) {
+  const { day } = stemBranch;
+  const dayStem = day.stem;
+  const dayBranch = day.branch;
 
-  const duplicateBranch = Object.keys(branchCounts).find(
-    branch => branchCounts[branch] >= 2
+  // Traditional 别责 combinations
+  const bieZeCombinations = [
+    { stem: '甲', branch: '未' },
+    { stem: '乙', branch: '辰' },
+    { stem: '丙', branch: '戌' },
+    { stem: '丁', branch: '丑' },
+    { stem: '己', branch: '辰' },
+    { stem: '庚', branch: '戌' },
+    { stem: '辛', branch: '未' },
+    { stem: '壬', branch: '丑' },
+    { stem: '癸', branch: '辰' }
+  ];
+
+  // Check if current day matches any 别责 combination
+  const isBieZeDay = bieZeCombinations.some(
+    combo => combo.stem === dayStem && combo.branch === dayBranch
   );
 
-  if (duplicateBranch) {
-    const duplicateBranchUpperSpirit = findUpperSpirit(heavenPan, duplicateBranch);
-    const firstTransmission = {
-      general: generalsPan ? generalsPan[duplicateBranchUpperSpirit.branch].general : null,
-      element: getBranchElement(duplicateBranchUpperSpirit.branch),
-      description: `别责法：${duplicateBranch}`,
-      type: TRANSMISSION_TYPES.first
-    };
+  return isBieZeDay;
+}
 
-    const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
-    const third = calculateNextTransmission(second, heavenPan, generalsPan);
-
-    return {
-      first: firstTransmission,
-      second: second,
-      third: third
-    };
+// 别责法 - When specific day stem-branch combinations occur
+function tryBieZeMethod(classes, heavenPan, generalsPan, stemBranch) {
+  // Check 别责 condition
+  if (!checkBieZeCondition(classes, stemBranch)) {
+    return null;
   }
 
-  return null;
+  const { day } = stemBranch;
+
+  // 别责法 uses the upper spirit of the specific branch
+  const targetBranch = day.branch;
+  const targetBranchUpperSpirit = findUpperSpirit(heavenPan, targetBranch);
+
+  const firstTransmission = {
+    general: generalsPan ? generalsPan[targetBranchUpperSpirit.branch].general : null,
+    element: getBranchElement(targetBranchUpperSpirit.branch),
+    description: `别责法：${day.stem}${day.branch}`,
+    type: TRANSMISSION_TYPES.first
+  };
+
+  const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+  const third = calculateNextTransmission(second, heavenPan, generalsPan);
+
+  return {
+    first: firstTransmission,
+    second: second,
+    third: third
+  };
 }
 
 // 昴星法 - Use 酉 for daytime, 卯 for nighttime

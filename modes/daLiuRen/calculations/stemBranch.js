@@ -9,6 +9,11 @@ import {
   isControllingRelationship
 } from '../data.js';
 
+import {
+  solarToLunar,
+  getLunarMonthBranchIndex
+} from './lunarCalendar.js';
+
 // Traditional stem-branch calculation (enhanced for full Da Liu Ren)
 export function calculateStemBranchTraditional(year, month, day, hour) {
   // Calculate year in the 60-year sexagenary cycle
@@ -18,8 +23,10 @@ export function calculateStemBranchTraditional(year, month, day, hour) {
 
   // Month stem: traditional 五虎遁 method
   // Formula: 甲己之年丙作首, 乙庚之年戊为头, 丙辛之年庚为上, 丁壬之年壬为居, 戊癸之年甲为魁
+  // IMPORTANT: Use lunar month, not solar month
   // First lunar month is 寅月 (index 2)
-  const monthBranchIndex = (month + 1) % 12; // 正月=寅月 (index 2)
+  const lunarDate = solarToLunar(year, month, day);
+  const monthBranchIndex = getLunarMonthBranchIndex(lunarDate.lunarMonth);
   const monthStemIndex = (yearStemIndex * 2 + monthBranchIndex) % 10;
 
   // Day stem and branch (accurate calculation using 60甲子 cycle)
