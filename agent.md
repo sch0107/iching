@@ -65,8 +65,16 @@ This is a traditional Chinese divination web application built with React + Vite
 │   │   └── components/# UI components
 │   │       ├── index.js
 │   │       └── Pillar.jsx               # Pillar visualization component
-│   ├── Tarot.jsx        # Tarot card divination
-│   └── tarotData.js     # 78-card structure + Fisher-Yates shuffle
+│   ├── tarot/           # Tarot card divination - Modular architecture
+│   │   ├── index.jsx    # Entry point, exports Tarot component
+│   │   ├── Tarot.jsx    # Main component with UI and state management
+│   │   ├── data.js      # Card data (TAROT_CARDS, GOOD_CARDS, constants)
+│   │   ├── calculations/# Calculation logic modules
+│   │   │   ├── index.js
+│   │   │   └── shuffle.js # Fisher-Yates shuffle, drawCards
+│   │   └── components/  # UI components
+│   │       ├── index.js
+│   │       └── CardDisplay.jsx # CardLabel, CardDisplay components
 └── locales/
     ├── en.json          # English translations (UI + hexagrams +八卦 + spirits)
     ├── zh-Hans.json     # Simplified Chinese
@@ -168,7 +176,8 @@ function MyComponent() {
 - 78 cards: 22 Major Arcana + 56 Minor Arcana (4 suits × 14)
 - Spreads: single, 3-card, 5-card, Celtic Cross (10-card)
 - Optional reversal support
-- Fisher-Yates shuffle algorithm in `tarotData.js`
+- Fisher-Yates shuffle algorithm in `modes/tarot/calculations/shuffle.js`
+- All data in `modes/tarot/data.js` (TAROT_CARDS, GOOD_CARDS, constants)
 
 ## Common Tasks
 
@@ -203,7 +212,8 @@ function MyComponent() {
 - `App.jsx` - Main navigation and layout
 - `i18n.js` - Translation configuration
 - `locales/` - All translation content
-- `modes/tarotData.js` - Tarot card data and shuffle algorithm
+- `modes/tarot/` - Tarot module with data, calculations, and components
+- `modes/daLiuRen/` - Da Liu Ren module with full Ba Zi implementation
 - `vite.config.js` - Build configuration for GitHub Pages
 
 ## Git Workflow
