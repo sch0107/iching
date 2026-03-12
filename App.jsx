@@ -5,7 +5,7 @@ import IChing from "./modes/IChing.jsx";
 import CoinToss from "./modes/CoinToss.jsx";
 import XiaoLiuRen from "./modes/XiaoLiuRen.jsx";
 import MeiHua from "./modes/MeiHua.jsx";
-import Tarot from "./modes/Tarot.jsx";
+import { Tarot } from "./modes/tarot";
 import { Da6 } from "./modes/daLiuRen";
 
 const LANGS = [

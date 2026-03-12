@@ -1,6 +1,7 @@
-// Structural (non-translatable) data for 78 Tarot cards.
-// All text (names, keywords, meanings) lives in the locale files under tarot.cards.{id}.*
+// ==================== Data structures for Tarot (塔罗牌) ====================
 
+// Card data for 78 Tarot cards
+// All text (names, keywords, meanings) lives in the locale files under tarot.cards.{id}.*
 export const TAROT_CARDS = [
   // ── Major Arcana (0–21) ──────────────────────────────────────────────────
   { id: 0,  arcana:"major", number:0  },
@@ -87,12 +88,49 @@ export const TAROT_CARDS = [
   { id: 77, arcana:"minor", suit:"pentacles", rank:14 },
 ];
 
-// Fisher-Yates shuffle returning a new array
-export function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+// Good cards for fun mode (mostly positive meanings)
+export const GOOD_CARDS = [0, 1, 3, 4, 5, 6, 7, 8, 10, 11, 14, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 33, 34, 35, 36, 37, 38, 39, 44, 46, 49, 50, 52, 54, 58, 59, 62, 63, 64, 68, 69, 72, 73, 74, 75, 76, 77];
+
+// Arcana types
+export const ARCANA_TYPES = {
+  MAJOR: "major",
+  MINOR: "minor"
+};
+
+// Suit types for Minor Arcana
+export const SUIT_TYPES = {
+  WANDS: "wands",
+  CUPS: "cups",
+  SWORDS: "swords",
+  PENTACLES: "pentacles"
+};
+
+// ==================== Helper Functions ====================
+
+/**
+ * Get card by ID
+ */
+export function getCardById(id) {
+  return TAROT_CARDS.find(card => card.id === id);
+}
+
+/**
+ * Get cards by arcana type
+ */
+export function getCardsByArcana(arcana) {
+  return TAROT_CARDS.filter(card => card.arcana === arcana);
+}
+
+/**
+ * Get cards by suit (Minor Arcana only)
+ */
+export function getCardsBySuit(suit) {
+  return TAROT_CARDS.filter(card => card.suit === suit);
+}
+
+/**
+ * Get all cards from good card pool
+ */
+export function getGoodCards() {
+  return GOOD_CARDS.map(id => getCardById(id)).filter(Boolean);
 }
