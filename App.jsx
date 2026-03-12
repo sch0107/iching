@@ -14,7 +14,7 @@ const LANGS = [
   { code: "zh-Hant", label: "繁" },
   { code: "en",      label: "EN" },
 ];
-const MODES = ["iching", "coin", "xlr", "mhy", "d6", "shengjiao", "tarot"];
+const MODES = ["iching", "mhy", "coin", "shengjiao", "xlr", "d6", "tarot"];
 
 export default function App() {
   const { t } = useTranslation();

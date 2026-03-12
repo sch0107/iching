@@ -10,11 +10,11 @@ This is a traditional Chinese divination web application built with React + Vite
 
 ### Seven Divination Modes
 1. **易经 (I Ching)** - Full 64-hexagram divination with changing lines and transformed hexagrams
-2. **铜钱 (Coin Toss)** - Single coin toss for quick yes/no questions
-3. **小六壬 (Xiao Liu Ren)** - Time-based divination using the six spirits method
-4. **梅花易术 (Mei Hua Yi Shu)** - Shao Yong's time-based hexagram method
-5. **大六壬 (Da Liu Ren)** - Birth date/time (Ba Zi) divination
-6. **圣筊 (Sheng Jiao / Moon Blocks)** - Traditional temple divination using two crescent-shaped wooden blocks for yes/no answers
+2. **梅花易术 (Mei Hua Yi Shu)** - Shao Yong's time-based hexagram method
+3. **铜钱 (Coin Toss)** - Single coin toss for quick yes/no questions
+4. **圣筊 (Sheng Jiao / Moon Blocks)** - Traditional temple divination using two crescent-shaped wooden blocks for yes/no answers
+5. **小六壬 (Xiao Liu Ren)** - Time-based divination using the six spirits method
+6. **大六壬 (Da Liu Ren)** - Birth date/time (Ba Zi) divination
 7. **塔罗牌 (Tarot)** - 78-card Tarot with multiple spreads and reversal support
 
 ### Key Features
