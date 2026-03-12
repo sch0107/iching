@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { TAROT_CARDS, getGoodCards } from "./data.js";
 import { drawCards } from "./calculations/index.js";
 import { CardDisplay } from "./components/index.js";
+import FunModeToggle from "../../components/FunModeToggle.jsx";
 
 const GOLD = "rgba(200,168,75,";
 
@@ -143,35 +144,7 @@ export default function Tarot() {
 
           {/* Fun mode toggle */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, gap: 12 }}>
-            <span style={{ fontSize: 11, letterSpacing: 2, color: GOLD + "0.6)" }}>
-              {t("tarot.funMode.label")}
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <button
-                onClick={() => setFunMode(false)}
-                style={{
-                  background: !funMode ? GOLD + "0.18)" : "none",
-                  border: `1px solid ${!funMode ? GOLD + "0.5)" : GOLD + "0.3)"}`,
-                  color: !funMode ? "#f5e09a" : GOLD + "0.5)",
-                  padding: "6px 14px", fontSize: 11, letterSpacing: 2,
-                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", borderRadius: 4,
-                }}
-              >
-                OFF
-              </button>
-              <button
-                onClick={() => setFunMode(true)}
-                style={{
-                  background: funMode ? GOLD + "0.18)" : "none",
-                  border: `1px solid ${funMode ? GOLD + "0.5)" : GOLD + "0.3)"}`,
-                  color: funMode ? "#f5e09a" : GOLD + "0.5)",
-                  padding: "6px 14px", fontSize: 11, letterSpacing: 2,
-                  cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s", borderRadius: 4,
-                }}
-              >
-                ON
-              </button>
-            </div>
+            <FunModeToggle enabled={funMode} onChange={setFunMode} />
           </div>
 
           {/* Question input */}

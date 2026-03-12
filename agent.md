@@ -40,6 +40,8 @@ This is a traditional Chinese divination web application built with React + Vite
 ├── main.jsx             # React entry point
 ├── index.html           # Vite template
 ├── vite.config.js       # Vite config (base: "/iching/")
+├── components/          # Shared UI components
+│   └── FunModeToggle.jsx # Toggle switch for "I'm feeling lucky" mode
 ├── modes/
 │   ├── IChing.jsx       # I Ching divination
 │   ├── CoinToss.jsx     # Coin toss divination
@@ -115,6 +117,7 @@ npm run preview
 - Each divination mode is a separate component in `modes/` directory
 - Components are state-managed internally using React hooks
 - Navigation is handled in `App.jsx`
+- **Shared components** in `components/` directory should be used for common UI elements (e.g., FunModeToggle)
 
 ### I18n Usage
 ```javascript

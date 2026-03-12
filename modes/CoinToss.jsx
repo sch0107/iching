@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n.js";
+import FunModeToggle from "../components/FunModeToggle.jsx";
 
 export default function CoinToss() {
   const { t }  = useTranslation();
@@ -90,37 +91,7 @@ export default function CoinToss() {
       {/* Fun mode toggle */}
       {!done && (
         <div style={{marginBottom:16,animation:"fi 0.5s ease"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:12}}>
-            <span style={{fontSize:12,letterSpacing:3,color:"rgba(200,168,75,0.6)"}}>
-              {t("funMode.label")}
-            </span>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <button
-                onClick={()=>setFunMode(false)}
-                style={{
-                  background:!funMode?"rgba(200,168,75,0.18)":"none",
-                  border:`1px solid ${!funMode?"rgba(200,168,75,0.5)":"rgba(200,168,75,0.3)"}`,
-                  color:!funMode?"#f5e09a":"rgba(200,168,75,0.5)",
-                  padding:"6px 14px",fontSize:11,letterSpacing:2,
-                  cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
-                }}
-              >
-                OFF
-              </button>
-              <button
-                onClick={()=>setFunMode(true)}
-                style={{
-                  background:funMode?"rgba(200,168,75,0.18)":"none",
-                  border:`1px solid ${funMode?"rgba(200,168,75,0.5)":"rgba(200,168,75,0.3)"}`,
-                  color:funMode?"#f5e09a":"rgba(200,168,75,0.5)",
-                  padding:"6px 14px",fontSize:11,letterSpacing:2,
-                  cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",borderRadius:4,
-                }}
-              >
-                ON
-              </button>
-            </div>
-          </div>
+          <FunModeToggle enabled={funMode} onChange={setFunMode} />
         </div>
       )}
 
