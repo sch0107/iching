@@ -40,6 +40,11 @@
     "on": "On",
     "off": "Off"
   },
+  "timezone": {
+    "label": "Timezone",
+    "utc8": "UTC+8",
+    "local": "Local"
+  },
   "line": {
     "0": "1st",
     "1": "2nd",

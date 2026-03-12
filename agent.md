@@ -41,7 +41,8 @@ This is a traditional Chinese divination web application built with React + Vite
 ├── index.html           # Vite template
 ├── vite.config.js       # Vite config (base: "/iching/")
 ├── components/          # Shared UI components
-│   └── FunModeToggle.jsx # Toggle switch for "I'm feeling lucky" mode
+│   ├── FunModeToggle.jsx   # Toggle switch for "I'm feeling lucky" mode
+│   └── TimezoneSelector.jsx # Timezone selector (UTC+8/Beijing Time vs Local)
 ├── modes/
 │   ├── IChing.jsx       # I Ching divination
 │   ├── CoinToss.jsx     # Coin toss divination

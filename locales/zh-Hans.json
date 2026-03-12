@@ -40,6 +40,11 @@
     "on": "开启",
     "off": "关闭"
   },
+  "timezone": {
+    "label": "时区",
+    "utc8": "北京时间",
+    "local": "本地"
+  },
   "line": {
     "0": "初",
     "1": "二",
@@ -119,7 +124,7 @@
     "summaryDesc":       "解说：",
     "footer":            "请结合所问之事解读此课。",
     "tzLabel":           "时区",
-    "tzUtc8":            "UTC+8",
+    "tzUtc8":            "北京时间",
     "tzLocal":           "本地",
     "signs": {
       "0": {"name": "大安", "keywords": "平安·顺遂", "desc": "万事皆安，求谋遂意，出行吉利，病者安康，失物可寻，诸事大吉。"},
@@ -161,7 +166,7 @@
     "copied":          "已复制！",
     "reset":           "重 新 开 始",
     "tzLabel":         "时区",
-    "tzUtc8":          "UTC+8",
+    "tzUtc8":          "北京时间",
     "tzLocal":         "本地",
     "summaryHeader":   "【梅花易术占卜结果】",
     "summaryTime":     "占卜时间：",

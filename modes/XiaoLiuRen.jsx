@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import FunModeToggle from "../components/FunModeToggle.jsx";
+import TimezoneSelector from "../components/TimezoneSelector.jsx";
 
 // Non-translatable sign metadata (color, fortune stars)
 const SIGNS_META = [
@@ -76,14 +77,6 @@ export default function XiaoLiuRen() {
     });
   };
 
-  const tzBtnStyle = (active) => ({
-    cursor:"pointer", padding:"3px 10px", fontSize:10, letterSpacing:1,
-    fontFamily:"inherit", transition:"all 0.2s",
-    background: active ? "rgba(200,168,75,0.18)" : "none",
-    border: `1px solid ${active ? "rgba(200,168,75,0.5)" : "rgba(200,168,75,0.2)"}`,
-    color: active ? "#f5e09a" : "rgba(200,168,75,0.45)",
-  });
-
   const btnStyle = (active) => ({
     display:"flex", alignItems:"center", gap:8, cursor:"pointer",
     background: active ? "rgba(200,168,75,0.18)" : "rgba(200,168,75,0.07)",
@@ -115,15 +108,8 @@ export default function XiaoLiuRen() {
 
       {/* Timezone selector */}
       {!done && (
-        <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:24,
-          fontSize:10, color:"rgba(200,168,75,0.5)", letterSpacing:2}}>
-          <span>{t("xlr.tzLabel")}：</span>
-          <button style={tzBtnStyle(useUtc8)}  onClick={() => setUseUtc8(true)}>
-            {t("xlr.tzUtc8")}
-          </button>
-          <button style={tzBtnStyle(!useUtc8)} onClick={() => setUseUtc8(false)}>
-            {t("xlr.tzLocal")}
-          </button>
+        <div style={{marginBottom:24, fontSize:10, color:"rgba(200,168,75,0.5)", letterSpacing:2}}>
+          <TimezoneSelector useUtc8={useUtc8} onChange={setUseUtc8} />
         </div>
       )}
 
