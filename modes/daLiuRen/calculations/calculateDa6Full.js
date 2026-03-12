@@ -5,7 +5,6 @@ import {
 import {
   determineYueJiang
 } from './yueJiang.js';
-import { determineYueJiang } from './yueJiang.js';
 import { calculateHeavenPan, calculateEarthPan } from './heavenPan.js';
 import { calculateGeneralsPan, getGuiRenPosition } from './twelveGenerals.js';
 import { calculateFourClasses } from './fourClasses.js';

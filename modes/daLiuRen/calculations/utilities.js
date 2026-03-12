@@ -12,15 +12,6 @@ import {
   countElements
 } from '../data.js';
 
-import {
-  calculateVacanciesByXun,
-  calculateSituation,
-  analyzeFiveElements,
-  getAllElements,
-  isDaytime,
-  calculateOverallFortune
-} from './utilities.js';
-
 // Calculate position in 60甲子 cycle
 export function calculateSexagenaryPosition(stemIndex, branchIndex) {
   // Find the position (0-59) where the given stem and branch combine
@@ -118,7 +109,6 @@ export function analyzeFiveElements(stemBranch, transmissions, classes) {
   }
 
   // Determine generating/controlling relationships
-  import { ELEMENT_RELATIONSHIPS } from '../data.js';
   const uniqueElements = [...new Set(elements)];
   uniqueElements.forEach(element => {
     if (ELEMENT_RELATIONSHIPS[element]) {

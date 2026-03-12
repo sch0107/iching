@@ -1,8 +1,8 @@
 import {
   EARTHLY_BRANCHES,
-  getBranchElement
+  getBranchElement,
+  WANG_XIANG_XIU_QIU_SI
 } from '../data.js';
-import { WANG_XIANG_XIU_QIU_SI } from '../daLiuRenData.js';
 
 // Calculate element state for a specific element based on month branch
 function analyzeElementState(element, monthBranch) {
