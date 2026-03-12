@@ -1,4 +1,4 @@
-import { EARTHLY_BRANCHES } from '../data.js';
+import { EARTHLY_BRANCHES, getBranchElement } from '../data.js';
 import { determineYueJiang } from './yueJiang.js';
 
 // Calculate Heaven Pan (天盤) positions using 月将加时 method
@@ -32,8 +32,6 @@ export function calculateHeavenPan(stemBranch, year, month, day, hour) {
 
 // Calculate Earth Pan (地盤) - fixed positions
 export function calculateEarthPan() {
-  import { getBranchElement } from '../data.js';
-
   const earthPan = {};
 
   EARTHLY_BRANCHES.forEach((branch, index) => {

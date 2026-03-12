@@ -2,6 +2,7 @@ import {
   EARTHLY_BRANCHES,
   HEAVENLY_STEMS,
   SITUATIONS,
+  ELEMENT_RELATIONSHIPS,
   getStemElement,
   getBranchElement,
   isGeneratingRelationship,
@@ -10,6 +11,15 @@ import {
   isElementsBalanced,
   countElements
 } from '../data.js';
+
+import {
+  calculateVacanciesByXun,
+  calculateSituation,
+  analyzeFiveElements,
+  getAllElements,
+  isDaytime,
+  calculateOverallFortune
+} from './utilities.js';
 
 // Calculate position in 60甲子 cycle
 export function calculateSexagenaryPosition(stemIndex, branchIndex) {

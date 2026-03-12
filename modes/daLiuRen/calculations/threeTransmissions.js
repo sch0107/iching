@@ -6,7 +6,13 @@ import {
   getBranchElement,
   isControllingRelationship
 } from '../data.js';
-import { findUpperSpirit } from './twelveGenerals.js';
+import {
+  EARTHLY_BRANCHES
+} from '../data.js';
+
+import {
+  findUpperSpirit
+} from './twelveGenerals.js';
 
 // Calculate Three Transmissions (三傳) using traditional 九宗门 methods
 export function calculateThreeTransmissions(stemBranch, classes, heavenPan, generalsPan, funMode, isDay) {
