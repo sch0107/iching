@@ -10,7 +10,7 @@ const GOLD = "rgba(200,168,75,";
 export default function Tarot() {
   const { t } = useTranslation();
   const [spread,      setSpread]      = useState("single"); // "single" | "three" | "five" | "celtic"
-  const [allowRev,    setAllowRev]    = useState(false);
+  const [allowRev,    setAllowRev]    = useState(true);
   const [question,    setQuestion]    = useState("");
   const [cards,       setCards]       = useState(null);
   const [drawing,     setDrawing]     = useState(false);
