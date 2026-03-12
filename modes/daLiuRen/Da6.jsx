@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   GOLD,
@@ -10,6 +11,7 @@ import {
 import { calculateDa6Full } from './calculations';
 import { Pillar } from './components';
 import FunModeToggle from '../../components/FunModeToggle.jsx';
+import ScreenshotButton from '../../components/ScreenshotButton.jsx';
 
 function LineMini({ val, color }) {
   return val === 1
@@ -855,6 +857,7 @@ function getFortuneDescription(fortune) {
 // Main Da Liu Ren component
 export default function Da6() {
   const { t } = useTranslation();
+  const resultAreaRef = useRef(null);
 
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState(null);
@@ -1134,7 +1137,7 @@ export default function Da6() {
 
       {/* Result */}
       {done && (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center",
+        <div ref={resultAreaRef} style={{ display: "flex", flexDirection: "column", alignItems: "center",
           gap: 16, animation: "fi 0.6s ease", width: "100%", maxWidth: 480 }}>
 
           {/* Situation and Time Display */}
@@ -1225,6 +1228,7 @@ export default function Da6() {
               <span>↺</span>
               <span>{t("mhy.again")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="daliuren" />
           </div>
 
           {/* Preview summary */}

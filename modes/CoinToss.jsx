@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n.js";
 import FunModeToggle from "../components/FunModeToggle.jsx";
+import ScreenshotButton from "../components/ScreenshotButton.jsx";
 
 export default function CoinToss() {
   const { t }  = useTranslation();
   const lang   = i18n.language;
+  const resultAreaRef = useRef(null);
 
   const [question,    setQuestion]    = useState("");
   const [result,      setResult]      = useState(null);   // null | "yang" | "yin"
@@ -238,7 +241,7 @@ export default function CoinToss() {
       )}
 
       {/* Coin */}
-      <div style={{perspective:500, marginBottom:40}}>
+      <div ref={resultAreaRef} style={{perspective:500, marginBottom:40}}>
         <div
           key={flipKey}
           style={{
@@ -367,6 +370,7 @@ export default function CoinToss() {
               <span>↺</span>
               <span>{t("coin.again")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="coin" />
           </div>
 
           <button className="reset-btn" onClick={reset} style={{

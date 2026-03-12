@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n.js";
 import FunModeToggle from "../components/FunModeToggle.jsx";
+import ScreenshotButton from "../components/ScreenshotButton.jsx";
 
 export default function ShengJiao() {
   const { t }  = useTranslation();
   const lang   = i18n.language;
+  const resultAreaRef = useRef(null);
 
   const [question,    setQuestion]    = useState("");
   const [result,      setResult]      = useState(null);   // null | "sheng" | "xiao" | "yin"
@@ -256,7 +259,7 @@ export default function ShengJiao() {
       )}
 
       {/* Two Moon Blocks */}
-      <div style={{display:"flex", gap:32, marginBottom:40, perspective:400}}>
+      <div ref={resultAreaRef} style={{display:"flex", gap:32, marginBottom:40, perspective:400}}>
         {/* Block 1 */}
         <div style={{width:90, height:120, position:"relative"}}>
           <div
@@ -453,6 +456,7 @@ export default function ShengJiao() {
               <span>↺</span>
               <span>{t("shengjiao.again")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="moonblocks" />
           </div>
 
           <button className="reset-btn" onClick={reset} style={{

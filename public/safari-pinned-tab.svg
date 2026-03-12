@@ -1,0 +1,12 @@
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+<rect width="512" height="512" fill="#150f05"/>
+<g transform="translate(256,256) scale(1,-1)">
+  <!-- Yin Yang symbol -->
+  <circle cx="0" cy="0" r="180" fill="#c8a84b"/>
+  <path d="M 0 -180 A 180 180 0 0 1 0 180 A 180 180 0 0 1 0 -180" fill="#150f05" />
+  <circle cx="0" cy="-60" r="54" fill="#c8a84b"/>
+  <circle cx="0" cy="60" r="54" fill="#150f05"/>
+  <circle cx="0" cy="-60" r="18" fill="#150f05"/>
+  <circle cx="0" cy="60" r="18" fill="#c8a84b"/>
+</g>
+</svg>

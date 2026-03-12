@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FunModeToggle from "../components/FunModeToggle.jsx";
 import TimezoneSelector from "../components/TimezoneSelector.jsx";
+import ScreenshotButton from "../components/ScreenshotButton.jsx";
 
 // Earlier Heaven (先天八卦) trigram numbers → binary key (top→bottom)
 // 1=乾, 2=兑, 3=离, 4=震, 5=巽, 6=坎, 7=艮, 8=坤
@@ -163,6 +165,7 @@ function HexMini({ hexArr, movingLine, accent, label, t }) {
 export default function MeiHua() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const resultAreaRef = useRef(null);
 
   const [question, setQuestion] = useState("");
   const [result,   setResult]   = useState(null);
@@ -342,7 +345,7 @@ export default function MeiHua() {
 
       {/* Hexagram cards */}
       {done && result && (
-        <div className="hex-row" style={{display:"flex", gap:24, flexWrap:"wrap",
+        <div ref={resultAreaRef} className="hex-row" style={{display:"flex", gap:24, flexWrap:"wrap",
           justifyContent:"center", animation:"fi 0.6s ease", marginBottom:28}}>
           <div className="hex-card">
             <HexMini
@@ -379,6 +382,7 @@ export default function MeiHua() {
               <span>↺</span>
               <span>{t("mhy.again")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="meihua" />
           </div>
           <button className="reset-btn" onClick={reset} style={{
             background:"none", border:"none",

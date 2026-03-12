@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { TAROT_CARDS, getGoodCards } from "./data.js";
 import { drawCards } from "./calculations/index.js";
 import { CardDisplay } from "./components/index.js";
 import FunModeToggle from "../../components/FunModeToggle.jsx";
+import ScreenshotButton from "../../components/ScreenshotButton.jsx";
 
 const GOLD = "rgba(200,168,75,";
 
 export default function Tarot() {
   const { t } = useTranslation();
+  const resultAreaRef = useRef(null);
   const [spread,      setSpread]      = useState("single"); // "single" | "three" | "five" | "celtic"
   const [allowRev,    setAllowRev]    = useState(true);
   const [question,    setQuestion]    = useState("");
@@ -201,7 +204,7 @@ export default function Tarot() {
           )}
 
           {/* Cards row */}
-          <div className="hex-row" style={{
+          <div ref={resultAreaRef} className="hex-row" style={{
             display: "flex", gap: 16, justifyContent: "center",
             flexWrap: "wrap", marginBottom: 28,
           }}>
@@ -247,6 +250,7 @@ export default function Tarot() {
             }}>
               {copied ? t("tarot.copied") : t("tarot.copy")}
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="tarot" />
             <button className="action-btn reset-btn" onClick={handleReset} style={{
               background: "none", border: "none",
               color: GOLD + "0.4)", fontSize: 12, letterSpacing: 2, padding: "8px 20px",

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FunModeToggle from "../components/FunModeToggle.jsx";
+import ScreenshotButton from "../components/ScreenshotButton.jsx";
 
 // Only num is non-translatable; name/title/judgment come from locales
 const HEXAGRAM_DB = {
@@ -151,6 +153,7 @@ function HexCard({ label, lines, isResult }) {
 export default function IChing() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const resultAreaRef = useRef(null);
 
   const [question, setQuestion] = useState("");
   const [lines,    setLines]    = useState(null);
@@ -225,6 +228,9 @@ export default function IChing() {
         <div style={{width:100,height:1,
           background:"linear-gradient(90deg,transparent,#c8a84b,transparent)",margin:"14px auto 0"}}/>
       </div>
+
+      {/* Result area - wrapped for screenshot */}
+      <div ref={resultAreaRef} style={{width:"100%",display:"flex",flexDirection:"column",alignItems:"center"}}>
 
       {/* Fun mode toggle */}
       {!done && (
@@ -331,6 +337,7 @@ export default function IChing() {
               <span style={{fontSize:15}}>↓</span>
               <span>{t("actions.export")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename={t("summary.filePrefix")} />
           </div>
           <div style={{width:"100%",background:"rgba(0,0,0,0.35)",
             border:"1px solid rgba(200,168,75,0.1)",padding:"14px 18px"}}>
@@ -350,6 +357,7 @@ export default function IChing() {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FunModeToggle from "../components/FunModeToggle.jsx";
 import TimezoneSelector from "../components/TimezoneSelector.jsx";
+import ScreenshotButton from "../components/ScreenshotButton.jsx";
 
 // Non-translatable sign metadata (color, fortune stars)
 const SIGNS_META = [
@@ -37,6 +39,7 @@ function calculate(useUtc8, funMode) {
 export default function XiaoLiuRen() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const resultAreaRef = useRef(null);
 
   const [question, setQuestion] = useState("");
   const [reading,  setReading]  = useState(null);
@@ -169,7 +172,7 @@ export default function XiaoLiuRen() {
 
       {/* Six signs row */}
       {done && (
-        <div className="sign-row" style={{display:"flex", gap:10, marginBottom:32,
+        <div ref={resultAreaRef} className="sign-row" style={{display:"flex", gap:10, marginBottom:32,
           justifyContent:"center", animation:"fi 0.5s ease", flexWrap:"wrap", maxWidth:640}}>
           {SIGNS_META.map((meta, i) => {
             const isResult = i === reading.index;
@@ -241,6 +244,7 @@ export default function XiaoLiuRen() {
               <span>↺</span>
               <span>{t("xlr.again")}</span>
             </button>
+            <ScreenshotButton target={resultAreaRef} filename="xiaoliuren" />
           </div>
           <button className="reset-btn" onClick={reset} style={{
             background:"none", border:"none",

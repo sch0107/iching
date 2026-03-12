@@ -377,5 +377,10 @@
     "101010": {"name": "After Completion",        "title": "Water / Fire",        "judgment": "Success in small matters. Perseverance furthers. At the beginning good fortune, at the end disorder."},
     "010101": {"name": "Before Completion",       "title": "Fire / Water",        "judgment": "Success. But if the little fox, after nearly completing the crossing, gets his tail in the water, there is nothing that would further."},
     "unknown": {"name": "Unknown",                "title": "Unknown",             "judgment": "This hexagram is not in the database."}
+  },
+  "screenshot": {
+    "button": "📷 Screenshot",
+    "capturing": "Capturing…",
+    "captured": "Saved!"
   }
 }

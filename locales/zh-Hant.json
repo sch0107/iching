@@ -377,5 +377,10 @@
     "101010": {"name": "既濟", "title": "水火既濟", "judgment": "亨，小利貞，初吉終亂。"},
     "010101": {"name": "未濟", "title": "火水未濟", "judgment": "亨，小狐汔濟，濡其尾，無攸利。"},
     "unknown": {"name": "？",  "title": "未知之卦", "judgment": "此卦暫未收錄。"}
+  },
+  "screenshot": {
+    "button": "📷 截圖",
+    "capturing": "截圖中…",
+    "captured": "已儲存！"
   }
 }

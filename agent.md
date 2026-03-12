@@ -21,15 +21,19 @@ This is a traditional Chinese divination web application built with React + Vite
 - Multi-language support (zh-Hans, zh-Hant, en) - all content in JSON locale files, no hardcoded text in components
 - Time zone selection (UTC+8 or local) for Xiao Liu Ren and Mei Hua modes
 - Copy results to clipboard (for AI interpretation)
+- **Screenshot export** - Save divination results as high-quality PNG images (html-to-image)
 - Export results to .txt file (I Ching mode)
 - Mobile-responsive design
 - "I'm feeling lucky" randomization toggle
+- **PWA support** - Installable as mobile app with offline capability (service worker)
 
 ## Technology Stack
 
 - **React 18** - UI framework
 - **Vite** - Build tool
 - **react-i18next** - Internationalization
+- **html-to-image** - Screenshot capture (PNG export)
+- **canvas** (dev) - Icon generation for PWA
 - **GitHub Actions** - CI/CD
 - **GitHub Pages** - Hosting
 
@@ -39,11 +43,12 @@ This is a traditional Chinese divination web application built with React + Vite
 ├── App.jsx              # Root component with navigation and routing
 ├── i18n.js              # i18next configuration
 ├── main.jsx             # React entry point
-├── index.html           # Vite template
+├── index.html           # Vite template with PWA meta tags
 ├── vite.config.js       # Vite config (base: "/iching/")
 ├── components/          # Shared UI components
 │   ├── FunModeToggle.jsx   # Toggle switch for "I'm feeling lucky" mode
-│   └── TimezoneSelector.jsx # Timezone selector (UTC+8/Beijing Time vs Local)
+│   ├── TimezoneSelector.jsx # Timezone selector (UTC+8/Beijing Time vs Local)
+│   └── ScreenshotButton.jsx # Screenshot capture button (html-to-image)
 ├── modes/
 │   ├── IChing.jsx       # I Ching divination
 │   ├── CoinToss.jsx     # Coin toss divination
@@ -79,6 +84,14 @@ This is a traditional Chinese divination web application built with React + Vite
 │   │   └── components/  # UI components
 │   │       ├── index.js
 │   │       └── CardDisplay.jsx # CardLabel, CardDisplay components
+├── public/              # PWA assets
+│   ├── manifest.json      # PWA manifest
+│   ├── sw.js            # Service worker for offline support
+│   ├── safari-pinned-tab.svg
+│   ├── browserconfig.xml
+│   └── icon-*.png       # App icons (11 sizes)
+└── scripts/
+    └── generate-icons.js # Icon generation script
 └── locales/
     ├── en.json          # English translations (UI + hexagrams +八卦 + spirits)
     ├── zh-Hans.json     # Simplified Chinese
@@ -202,6 +215,54 @@ function MyComponent() {
   - **Multiple (多掷)** - Specify number of tosses (2-100), get all results at once with summary
   - **Continuous (连续掷)** - Keep tossing one by one, view history of all tosses
 
+## PWA Features
+
+### Progressive Web App (PWA)
+- **Installable** - Can be added to home screen on mobile devices
+- **Offline support** - Service worker caches app assets for offline access
+- **App-like experience** - Standalone display mode, native-like feel
+- **Theme color** - Matches app's dark theme (#150f05)
+- **Icons** - 11 icon sizes (16px to 512px) generated with canvas
+
+### PWA Files
+- `public/manifest.json` - PWA manifest with app metadata
+- `public/sw.js` - Service worker for offline caching
+- `public/icon-*.png` - App icons for all platforms
+- `public/safari-pinned-tab.svg` - Safari pinned tab icon
+- `public/browserconfig.xml` - Windows tile configuration
+- `scripts/generate-icons.js` - Script to regenerate icons
+
+### Generate Icons
+```bash
+npm run generate-icons
+```
+
+## Screenshot Export
+
+### ScreenshotButton Component
+- **Location**: `components/ScreenshotButton.jsx`
+- **Purpose**: Capture divination results as high-quality PNG images
+- **Library**: html-to-image (toPng with 2x pixel ratio)
+- **Features**:
+  - High-quality export (2x pixel ratio)
+  - Captures full result area including hexagrams, cards, coins, etc.
+  - Filename format: `{mode}_{date}.png`
+  - Loading state during capture
+  - Success feedback when saved
+
+### Usage in Divination Modes
+All divination modes now include the screenshot button alongside copy/export actions:
+- IChing.jsx
+- CoinToss.jsx
+- ShengJiao.jsx
+- XiaoLiuRen.jsx
+- MeiHua.jsx
+- Tarot.jsx
+- daLiuRen/Da6.jsx
+
+### Implementation
+Each mode wraps the result display area with a `ref={resultAreaRef}` and passes it to `<ScreenshotButton target={resultAreaRef} filename="mode" />`.
+
 ## Common Tasks
 
 ### Adding a new language
@@ -228,7 +289,10 @@ function MyComponent() {
 - Check mobile layout (responsive design)
 - Test copy-to-clipboard functionality
 - Verify export to .txt (I Ching mode)
+- Test screenshot export on all modes
 - Test time zone switching (Xiao Liu Ren, Mei Hua)
+- Verify PWA installation on mobile devices
+- Test offline functionality (service worker)
 
 ## Key Files to Reference
 
