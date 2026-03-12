@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TAROT_CARDS, getGoodCards } from "./tarot/data.js";
-import { drawCards } from "./tarot/calculations/index.js";
-import { CardDisplay } from "./tarot/components/index.js";
+import { TAROT_CARDS, getGoodCards } from "./data.js";
+import { drawCards } from "./calculations/index.js";
+import { CardDisplay } from "./components/index.js";
 
 const GOLD = "rgba(200,168,75,";
 
