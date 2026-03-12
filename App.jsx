@@ -7,13 +7,14 @@ import XiaoLiuRen from "./modes/XiaoLiuRen.jsx";
 import MeiHua from "./modes/MeiHua.jsx";
 import { Tarot } from "./modes/tarot";
 import { Da6 } from "./modes/daLiuRen";
+import ShengJiao from "./modes/ShengJiao.jsx";
 
 const LANGS = [
   { code: "zh-Hans", label: "简" },
   { code: "zh-Hant", label: "繁" },
   { code: "en",      label: "EN" },
 ];
-const MODES = ["iching", "coin", "xlr", "mhy", "d6", "tarot"];
+const MODES = ["iching", "coin", "xlr", "mhy", "d6", "shengjiao", "tarot"];
 
 export default function App() {
   const { t } = useTranslation();
@@ -42,6 +43,21 @@ export default function App() {
         /* coin */
         @keyframes coinFlipYang { from{transform:rotateY(0)} to{transform:rotateY(1440deg)} }
         @keyframes coinFlipYin  { from{transform:rotateY(0)} to{transform:rotateY(1620deg)} }
+        /* moon blocks */
+        @keyframes blockTossLeft {
+          0% { transform:translateY(0) rotate(0deg); }
+          25% { transform:translateY(-60px) rotate(180deg); }
+          50% { transform:translateY(-20px) rotate(360deg); }
+          75% { transform:translateY(-50px) rotate(540deg); }
+          100% { transform:translateY(0) rotate(720deg); }
+        }
+        @keyframes blockTossRight {
+          0% { transform:translateY(0) rotate(0deg); }
+          25% { transform:translateY(-70px) rotate(-160deg); }
+          50% { transform:translateY(-30px) rotate(-320deg); }
+          75% { transform:translateY(-45px) rotate(-480deg); }
+          100% { transform:translateY(0) rotate(-640deg); }
+        }
         /* mobile */
         @media(max-width:600px){
           .hex-row  { flex-direction:column!important; align-items:center }
@@ -108,6 +124,7 @@ export default function App() {
         {mode === "mhy"    && <MeiHua />}
         {mode === "d6"     && <Da6 />}
         {mode === "tarot"  && <Tarot />}
+        {mode === "shengjiao" && <ShengJiao />}
       </div>
     </div>
   );

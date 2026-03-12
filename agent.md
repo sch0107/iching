@@ -2,19 +2,20 @@
 
 ## Project Overview
 
-This is a traditional Chinese divination web application built with React + Vite. It provides six different divination modes and supports three languages (Simplified Chinese, Traditional Chinese, and English). The app is deployed to GitHub Pages.
+This is a traditional Chinese divination web application built with React + Vite. It provides seven different divination modes and supports three languages (Simplified Chinese, Traditional Chinese, and English). The app is deployed to GitHub Pages.
 
 **Live URL:** https://sch0107.github.io/iching/
 
 ## Core Features
 
-### Six Divination Modes
+### Seven Divination Modes
 1. **易经 (I Ching)** - Full 64-hexagram divination with changing lines and transformed hexagrams
 2. **铜钱 (Coin Toss)** - Single coin toss for quick yes/no questions
 3. **小六壬 (Xiao Liu Ren)** - Time-based divination using the six spirits method
 4. **梅花易术 (Mei Hua Yi Shu)** - Shao Yong's time-based hexagram method
 5. **大六壬 (Da Liu Ren)** - Birth date/time (Ba Zi) divination
-6. **塔罗牌 (Tarot)** - 78-card Tarot with multiple spreads and reversal support
+6. **圣筊 (Sheng Jiao / Moon Blocks)** - Traditional temple divination using two crescent-shaped wooden blocks for yes/no answers
+7. **塔罗牌 (Tarot)** - 78-card Tarot with multiple spreads and reversal support
 
 ### Key Features
 - Multi-language support (zh-Hans, zh-Hant, en) - all content in JSON locale files, no hardcoded text in components
@@ -183,6 +184,16 @@ function MyComponent() {
 - Fisher-Yates shuffle algorithm in `modes/tarot/calculations/shuffle.js`
 - All data in `modes/tarot/data.js` (TAROT_CARDS, GOOD_CARDS, constants)
 
+### Sheng Jiao (圣筊 / Moon Blocks)
+- Traditional temple divination using two crescent-shaped wooden blocks (筊杯)
+- Three possible outcomes when tossed:
+  - **圣筊** (Sheng Jiao) - one block flat side up, one flat side down → YES/Auspicious
+  - **笑筊** (Xiao Jiao) - both blocks flat side up → Laughing/Indeterminate → Try again
+  - **阴筊** (Yin Jiao) - both blocks flat side down → NO/Negative
+- Realistic probability distribution: ~50% Sheng, ~25% Xiao, ~25% Yin
+- Used in Chinese temples to ask deities yes/no questions
+- "I'm feeling lucky" mode always returns Sheng for auspicious result
+
 ## Common Tasks
 
 ### Adding a new language
@@ -204,7 +215,7 @@ function MyComponent() {
 
 ## Testing Notes
 
-- Test all six divination modes
+- Test all seven divination modes
 - Verify all three languages work correctly
 - Check mobile layout (responsive design)
 - Test copy-to-clipboard functionality

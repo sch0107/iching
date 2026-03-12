@@ -72,7 +72,8 @@
     "xlr":    "Six Signs",
     "mhy":    "Plum Oracle",
     "tarot":  "Tarot",
-    "d6":     "Da Liu Ren"
+    "d6":     "Da Liu Ren",
+    "shengjiao": "Moon Blocks"
   },
   "coin": {
     "subtitle":        "Coin Oracle",
@@ -98,6 +99,40 @@
     "summaryResult":   "Result: ",
     "summaryMsg":      "Message: ",
     "footer":          "Please interpret this result in light of your question."
+  },
+  "shengjiao": {
+    "subtitle":        "Moon Blocks Divination",
+    "title":           "掷筊问卜",
+    "questionLabel":   "Your Question (optional)",
+    "questionPlaceholder": "Ask a yes / no question…",
+    "questionDisplay": "Question",
+    "button":          "✦ 掷 筊",
+    "tossing":         "Tossing…",
+    "shengName":       "Sheng Jiao",
+    "shengSub":        "Sheng · Yes",
+    "shengMsg":        "The oracle grants Sheng — a clear yes. Your wish is favorable and the way is open.",
+    "xiaoName":        "Xiao Jiao",
+    "xiaoSub":         "Xiao · Uncertain",
+    "xiaoMsg":         "The oracle grants Xiao — divine will is unclear. Please toss again.",
+    "yinName":         "Yin Jiao",
+    "yinSub":          "Yin · No",
+    "yinMsg":          "The oracle grants Yin — a no. It is best to pause and reconsider.",
+    "again":           "Toss Again",
+    "copy":            "Copy Result",
+    "copied":          "Copied!",
+    "reset":           "Start Over",
+    "summaryHeader":   "[Moon Blocks Oracle]",
+    "summaryTime":     "Date: ",
+    "summaryQ":        "Question: ",
+    "summaryResult":   "Result: ",
+    "summaryMsg":      "Message: ",
+    "footer":          "Please interpret this result in light of your question.",
+    "funMode": {
+      "label": "I'm feeling lucky",
+      "hint": "",
+      "on": "On",
+      "off": "Off"
+    }
   },
   "xlr": {
     "subtitle":          "Six Signs Oracle",

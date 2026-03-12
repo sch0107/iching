@@ -72,7 +72,8 @@
     "xlr":    "小六壬",
     "mhy":    "梅花易术",
     "tarot":  "塔罗",
-    "d6":     "大六壬"
+    "d6":     "大六壬",
+    "shengjiao": "圣筊"
   },
   "coin": {
     "subtitle":        "铜钱占卜",
@@ -98,6 +99,40 @@
     "summaryResult":   "结果：",
     "summaryMsg":      "提示：",
     "footer":          "请结合所问之事解读此占。"
+  },
+  "shengjiao": {
+    "subtitle":        "圣筊占卜",
+    "title":           "掷筊问卜",
+    "questionLabel":   "所问之事（可留空）",
+    "questionPlaceholder": "在此输入问题…",
+    "questionDisplay": "所问之事",
+    "button":          "✦ 掷 筊",
+    "tossing":         "掷筊中…",
+    "shengName":       "圣筊",
+    "shengSub":        "圣筊 · 允",
+    "shengMsg":        "神明所示圣筊，所问之事吉顺可行。",
+    "xiaoName":        "笑筊",
+    "xiaoSub":         "笑筊 · 疑",
+    "xiaoMsg":         "笑筊不明，神意未定，请再掷一次。",
+    "yinName":         "阴筊",
+    "yinSub":          "阴筊 · 否",
+    "yinMsg":          "神明所示阴筊，所问之事不可行，暂缓为宜。",
+    "again":           "再掷一次",
+    "copy":            "复制结果",
+    "copied":          "已复制！",
+    "reset":           "重新开始",
+    "summaryHeader":   "【圣筊占卜结果】",
+    "summaryTime":     "占卜时间：",
+    "summaryQ":        "所问之事：",
+    "summaryResult":   "结果：",
+    "summaryMsg":      "提示：",
+    "footer":          "请结合所问之事解读此占。",
+    "funMode": {
+      "label": "手气不错",
+      "hint": "",
+      "on": "开启",
+      "off": "关闭"
+    }
   },
   "xlr": {
     "subtitle":          "六壬占卜",
