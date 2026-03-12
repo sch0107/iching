@@ -1,9 +1,6 @@
 // Export all calculation functions
 export {
-  calculateStemBranchTraditional,
-  calculateGods,
-  calculateRelatives,
-  calculateRelativesLegacy
+  calculateStemBranchTraditional
 } from './stemBranch.js';
 
 export {
@@ -18,7 +15,6 @@ export {
 export {
   getJiGong,
   getGuiRenPosition,
-  placeTwelveGenerals,
   calculateGeneralsPan,
   findUpperSpirit
 } from './twelveGenerals.js';
@@ -35,18 +31,11 @@ export {
   calculateVacanciesByXun,
   calculateSituation,
   analyzeFiveElements,
-  getAllElements,
   isDaytime,
-  calculateOverallFortune,
-  getFortuneLabel,
-  getFortuneDescription
+  calculateOverallFortune
 } from './utilities.js';
 
 export {
-  calculateTianYiGuiRen,
-  calculateYueDeHe,
-  calculateSanQiLiuYi,
-  calculateYiMaTaoHuaHuaGai,
   calculateAllShenSha
 } from './divineSpirits.js';
 

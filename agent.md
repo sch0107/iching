@@ -159,7 +159,7 @@ function MyComponent() {
 - **综合卦象 (Overall Fortune)**: Comprehensive fortune scoring (大吉, 吉, 平, 凶, 大凶)
 - **日占/夜占 (Day/Night Divination)**: Different 贵人 position for daytime (辰时-戌时) vs nighttime
 - Traditional calendar-based stem-branch calculations with proper leap year handling
-- Data structures in `modes/daLiuRenData.js`
+- All data structures in `modes/daLiuRen/data.js`
 
 ### Tarot (塔罗牌)
 - 78 cards: 22 Major Arcana + 56 Minor Arcana (4 suits × 14)
