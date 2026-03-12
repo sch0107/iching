@@ -6,9 +6,6 @@ import {
   getBranchElement,
   isControllingRelationship
 } from '../data.js';
-import {
-  EARTHLY_BRANCHES
-} from '../data.js';
 
 import {
   findUpperSpirit
