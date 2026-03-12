@@ -144,7 +144,7 @@ function MyComponent() {
 ### Da Liu Ren (大六壬)
 - Requires birth date/time input (Ba Zi - 8 pillars)
 - **Complete traditional implementation** following authentic Chinese divination methods
-- **九宗门 (Nine Schools of Method)** for 三傳: 贼克法, 涉害法, 遥克法, 昴星法, 别责法, 八专法
+- **九宗门 (Nine Schools of Method)** for 三傳 with correct priority: 贼克法 > 涉害法 > 遥克法 > 昴星法 > 别责法 > 八专法
 - **三傳 (Three Transmissions)**: First, second, and third transmissions based on 九宗门 priority rules
 - **四課 (Four Classes)**: Traditional derivation using 日干寄宫 and 天盘上神
 - **月将加时 (Monthly General + Hour)**: Heaven pan rotates based on 月将 + hour branch
@@ -158,7 +158,10 @@ function MyComponent() {
 - **寄宫 (Temporary Residence)**: 日干寄宫 mapping (甲己寄丑, 乙庚寄子, etc.)
 - **综合卦象 (Overall Fortune)**: Comprehensive fortune scoring (大吉, 吉, 平, 凶, 大凶)
 - **日占/夜占 (Day/Night Divination)**: Different 贵人 position for daytime (辰时-戌时) vs nighttime
+- **农历 (Lunar Calendar)**: Uses lunar month (not solar month) for accurate month branch calculation - see `lunarCalendar.js`
 - Traditional calendar-based stem-branch calculations with proper leap year handling
+- **八专法 (Ba Zhuan Method)**: Correctly triggers when all four classes share same branch (四课俱同干)
+- **别责法 (Bie Ze Method)**: Correctly triggers only for specific day combinations (甲未、乙辰、丙戌、丁丑、己辰、庚戌、辛未、壬丑、癸辰)
 - All data structures in `modes/daLiuRen/data.js`
 
 ### Tarot (塔罗牌)
