@@ -155,8 +155,8 @@ function tryYaoKeMethod(classes, heavenPan, generalsPan, day) {
         type: TRANSMISSION_TYPES.first
       };
 
-      const second = calculateNextTransmission(firstTransmission, heavenPan);
-      const third = calculateNextTransmission(second, heavenPan);
+      const second = calculateNextTransmission(firstTransmission, heavenPan, generalsPan);
+      const third = calculateNextTransmission(second, heavenPan, generalsPan);
 
       return {
         first: firstTransmission,
