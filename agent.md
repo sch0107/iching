@@ -141,6 +141,10 @@ function MyComponent() {
 ### Coin Toss (铜钱)
 - Single coin toss for yes/no
 - Heads = Yang (auspicious), Tails = Yin (caution)
+- **Three throw modes:**
+  - **Single (单掷)** - Toss once, see result
+  - **Multiple (多掷)** - Specify number of throws (2-100), get all results at once with summary
+  - **Continuous (连续掷)** - Keep tossing one by one, view history of all tosses
 
 ### Xiao Liu Ren (小六壬)
 - Time-based calculation using month, day, and time
@@ -193,6 +197,10 @@ function MyComponent() {
 - Realistic probability distribution: ~50% Sheng, ~25% Xiao, ~25% Yin
 - Used in Chinese temples to ask deities yes/no questions
 - "I'm feeling lucky" mode always returns Sheng for auspicious result
+- **Three throw modes:**
+  - **Single (单掷)** - Toss once, see result
+  - **Multiple (多掷)** - Specify number of tosses (2-100), get all results at once with summary
+  - **Continuous (连续掷)** - Keep tossing one by one, view history of all tosses
 
 ## Common Tasks
 
