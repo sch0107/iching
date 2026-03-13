@@ -463,7 +463,7 @@ function ShenShaDisplay({ shenShaAnalysis }) {
 }
 
 // Branch Relationships Display (地支关系显示)
-function BranchRelationshipsDisplay({ branchRelationships }) {
+function BranchRelationshipsDisplay({ branchRelationships, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
@@ -595,7 +595,7 @@ function BranchRelationshipsDisplay({ branchRelationships }) {
                 fontSize: 12,
                 color: '#4caf50'
               }}>
-                {r.direction}方
+{t(`d6.${r.direction}`)}方
               </div>
             ))}
           </div>
@@ -1184,7 +1184,7 @@ export default function Da6() {
           <ShenShaDisplay shenShaAnalysis={result.shenShaAnalysis} />
 
           {/* Branch Relationships */}
-          <BranchRelationshipsDisplay branchRelationships={result.branchRelationships} />
+          <BranchRelationshipsDisplay branchRelationships={result.branchRelationships} t={t} />
 
           {/* Element States */}
           <ElementStatesDisplay elementStates={result.elementStates} />
