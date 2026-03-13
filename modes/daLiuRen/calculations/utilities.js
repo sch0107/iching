@@ -176,9 +176,10 @@ export function getAllElements(stemBranch, transmissions, classes) {
 
 // Determine if it's daytime
 export function isDaytime(hour) {
-  // Daytime is considered 7am (辰时, hour=5) to 7pm (戌时, hour=11)
-  // Nighttime is 7pm to 7am
-  return hour >= 5 && hour <= 11;
+  // Traditional Da Liu Ren divides day/night by 卯酉 (Mao-You) boundary
+  // Day (日占): 辰(4), 巳(5), 午(6), 未(7), 申(8), 酉(9)
+  // Night (夜占): 子(0), 丑(1), 寅(2), 戌(3), 亥(11)
+  return hour >= 4 && hour <= 9;
 }
 
 // Calculate overall fortune score
