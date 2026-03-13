@@ -1,5 +1,4 @@
 import {
-  EARTHLY_BRANCHES,
   LIU_HE,
   LIU_CHONG,
   SAN_HE,
@@ -205,13 +204,23 @@ export function checkAllBranchRelationships(branches) {
   }
 
   // Check for 方
-  const fangSet = new Set();
+  // 方 shows which directions are present in the branches, not per-branch records
+  const directionsPresent = new Set();
   for (const branch of branches) {
-    const fangResult = checkFang(branch);
-    if (fangResult.active && !fangSet.has(fangResult.direction)) {
-      result.fang.push(fangResult);
-      fangSet.add(fangResult.direction);
+    for (const [direction, directionBranches] of Object.entries(FANG.directions)) {
+      if (directionBranches.includes(branch)) {
+        directionsPresent.add(direction);
+      }
     }
+  }
+  for (const direction of directionsPresent) {
+    result.fang.push({
+      active: true,
+      relationship: '方',
+      direction: direction,
+      fortune: FANG.fortune,
+      description: FANG.description
+    });
   }
 
   // Check for 刑
