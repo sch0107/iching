@@ -941,6 +941,62 @@ export default function Da6() {
     out += "\n【空亡】\n";
     out += result.vacancies.description + "\n";
 
+    // Add five elements analysis
+    out += "\n【五行分析】\n";
+    out += "平衡度：" + (result.elementAnalysis.balanced ? "平衡" : "不平衡") + "\n";
+    out += "元素统计：" + JSON.stringify(result.elementAnalysis.elementCounts) + "\n";
+
+    // Add divine spirits analysis
+    out += "\n【神煞分析】\n";
+    const ss = result.shenShaAnalysis;
+    if (ss.tianYiGuiRen.branches.length > 0) {
+      out += "天乙贵人：" + ss.tianYiGuiRen.branches.join("、") + " - " + ss.tianYiGuiRen.description + "\n";
+    }
+    out += "月德：" + ss.yueDeHe.yueDe.branch + " - " + ss.yueDeHe.yueDe.description + "\n";
+    out += "月合：" + ss.yueDeHe.yueHe.branch + " - " + ss.yueDeHe.yueHe.description + "\n";
+    if (ss.sanQiLiuYi.sanQi.active) {
+      out += "三奇：" + ss.sanQiLiuYi.sanQi.description + "\n";
+    }
+    if (ss.sanQiLiuYi.liuYi.active) {
+      out += "六仪：" + ss.sanQiLiuYi.liuYi.description + "\n";
+    }
+    out += "驿马：" + ss.yiMaTaoHuaHuaGai.yiMa.branch + " - " + ss.yiMaTaoHuaHuaGai.yiMa.description + "\n";
+    out += "桃花：" + ss.yiMaTaoHuaHuaGai.taoHua.branch + " - " + ss.yiMaTaoHuaHuaGai.taoHua.description + "\n";
+    out += "华盖：" + ss.yiMaTaoHuaHuaGai.huaGai.branch + " - " + ss.yiMaTaoHuaHuaGai.huaGai.description + "\n";
+
+    // Add branch relationships
+    out += "\n【地支关系】\n";
+    const br = result.branchRelationships;
+    if (br.liuHe.length > 0) {
+      out += "六合：" + br.liuHe.map(r => r.element + "合").join("、") + " - " + br.liuHe[0].description + "\n";
+    }
+    if (br.liuChong.length > 0) {
+      out += "六冲：" + br.liuChong.length + "处 - " + br.liuChong[0].description + "\n";
+    }
+    if (br.sanHe?.active) {
+      out += "三合：" + br.sanHe.name + " - " + br.sanHe.description + "\n";
+    }
+    if (br.sanHui?.active) {
+      out += "三会：" + br.sanHui.name + " - " + br.sanHui.description + "\n";
+    }
+    if (br.fang.length > 0) {
+      const directions = [...new Set(br.fang.map(r => t(`d6.${r.direction}`)))];
+      out += "方：" + directions.join("、") + " - " + br.fang[0].description + "\n";
+    }
+    if (br.xing.length > 0) {
+      const xingTypes = [...new Set(br.xing.map(r => r.type))];
+      out += "刑：" + xingTypes.join("、") + " - " + br.xing[0].description + "\n";
+    }
+
+    // Add element states
+    out += "\n【五行状态】\n";
+    out += "季节：" + result.elementStates.season + "\n";
+    out += "旺：" + result.elementStates.summary.wang + "\n";
+    out += "相：" + result.elementStates.summary.xiang + "\n";
+    out += "休：" + result.elementStates.summary.xiu + "\n";
+    out += "囚：" + result.elementStates.summary.qiu + "\n";
+    out += "死：" + result.elementStates.summary.si + "\n";
+
     // Add overall fortune
     out += "\n【综合卦象】\n";
     out += getFortuneLabel(result.overallFortune) + "\n";
