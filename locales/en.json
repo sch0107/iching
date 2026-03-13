@@ -285,7 +285,20 @@
     "south": "South",
     "west": "West",
     "north": "North",
-    "stateSummary": "State Summary"
+    "stateSummary": "State Summary",
+    "threeTransmissions": "Three Transmissions",
+    "fourClasses": "Four Classes",
+    "heavenPanEarthPan": "Heaven & Earth Pan",
+    "fiveElementsAnalysis": "Five Elements Analysis",
+    "vacancies": "Vacancies",
+    "generatingRelations": "Generating Relations",
+    "controllingRelations": "Controlling Relations",
+    "elementBalance": "Element Balance",
+    "balanced": "Balanced",
+    "unbalanced": "Unbalanced",
+    "overallSign": "Overall Sign",
+    "dayDivination": "Day Divination",
+    "nightDivination": "Night Divination"
   },
   "branches": {
     "0":  "Zi",

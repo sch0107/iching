@@ -285,7 +285,20 @@
     "south": "南方",
     "west": "西方",
     "north": "北方",
-    "stateSummary": "狀態摘要"
+    "stateSummary": "狀態摘要",
+    "threeTransmissions": "三傳",
+    "fourClasses": "四課",
+    "heavenPanEarthPan": "天盤地盤",
+    "fiveElementsAnalysis": "五行分析",
+    "vacancies": "空亡",
+    "generatingRelations": "生成關係",
+    "controllingRelations": "克制關係",
+    "elementBalance": "元素平衡",
+    "balanced": "平衡",
+    "unbalanced": "不平衡",
+    "overallSign": "綜合卦象",
+    "dayDivination": "日占",
+    "nightDivination": "夜占"
   },
   "branches": {
     "0":  "子",

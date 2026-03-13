@@ -1,33 +1,21 @@
-import { useState } from "react";
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   GOLD,
-  HEAVENLY_STEMS,
   EARTHLY_BRANCHES,
-  TRANSMISSION_TYPES,
-  CLASS_TYPES
+  TRANSMISSION_TYPES
 } from './data.js';
 import { calculateDa6Full } from './calculations';
 import { Pillar } from './components';
 import FunModeToggle from '../../components/FunModeToggle.jsx';
 import ScreenshotButton from '../../components/ScreenshotButton.jsx';
 
-function LineMini({ val, color }) {
-  return val === 1
-    ? <div style={{width:60, height:6, background:color, borderRadius:1}}/>
-    : <div style={{width:60, display:"flex", gap:4}}>
-        <div style={{flex:1, height:6, background:color, borderRadius:1}}/>
-        <div style={{flex:1, height:6, background:color, borderRadius:1}}/>
-      </div>;
-}
-
 // Three Transmissions Display Component
-function ThreeTransmissionsDisplay({ transmissions }) {
+function ThreeTransmissionsDisplay({ transmissions, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-        三傳
+        {t('d6.threeTransmissions')}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {['first', 'second', 'third'].map((key) => (
@@ -75,11 +63,11 @@ function ThreeTransmissionsDisplay({ transmissions }) {
 }
 
 // Four Classes Display Component
-function FourClassesDisplay({ classes }) {
+function FourClassesDisplay({ classes, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-        四課
+        {t('d6.fourClasses')}
       </div>
       <div style={{
         display: 'grid',
@@ -121,11 +109,11 @@ function FourClassesDisplay({ classes }) {
 }
 
 // Heaven Pan Display Component
-function HeavenPanDisplay({ generalsPan }) {
+function HeavenPanDisplay({ generalsPan, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-        天盤地盤
+        {t('d6.heavenPanEarthPan')}
       </div>
       <div style={{
         padding: '20px',
@@ -167,11 +155,11 @@ function HeavenPanDisplay({ generalsPan }) {
 }
 
 // Five Elements Display Component
-function FiveElementsDisplay({ elementAnalysis }) {
+function FiveElementsDisplay({ elementAnalysis, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-        五行分析
+        {t('d6.fiveElementsAnalysis')}
       </div>
       <div style={{
         padding: '18px',
@@ -185,7 +173,7 @@ function FiveElementsDisplay({ elementAnalysis }) {
             color: 'rgba(200,168,75,0.5)',
             marginBottom: 8
           }}>
-            生成关系
+            {t('d6.generatingRelations')}
           </div>
           <div style={{
             display: 'flex',
@@ -212,7 +200,7 @@ function FiveElementsDisplay({ elementAnalysis }) {
             color: 'rgba(200,168,75,0.5)',
             marginBottom: 8
           }}>
-            克制关系
+            {t('d6.controllingRelations')}
           </div>
           <div style={{
             display: 'flex',
@@ -239,7 +227,7 @@ function FiveElementsDisplay({ elementAnalysis }) {
             color: 'rgba(200,168,75,0.5)',
             marginBottom: 8
           }}>
-            元素平衡
+            {t('d6.elementBalance')}
           </div>
           <div style={{
             padding: '8px 12px',
@@ -248,7 +236,7 @@ function FiveElementsDisplay({ elementAnalysis }) {
             fontSize: 12,
             color: elementAnalysis.balanced ? '#4caf50' : '#ff9800'
           }}>
-            {elementAnalysis.balanced ? '平衡' : '不平衡'}
+            {elementAnalysis.balanced ? t('d6.balanced') : t('d6.unbalanced')}
           </div>
         </div>
       </div>
@@ -257,11 +245,11 @@ function FiveElementsDisplay({ elementAnalysis }) {
 }
 
 // Vacancies Display Component
-function VacanciesDisplay({ vacancies }) {
+function VacanciesDisplay({ vacancies, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontSize: 11, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-        空亡
+        {t('d6.vacancies')}
       </div>
       <div style={{
         padding: '16px',
@@ -522,7 +510,7 @@ function BranchRelationshipsDisplay({ branchRelationships, t }) {
                 fontSize: 12,
                 color: '#d32f2f'
               }}>
-                冲
+                {r.element}冲
               </div>
             ))}
           </div>
@@ -595,7 +583,7 @@ function BranchRelationshipsDisplay({ branchRelationships, t }) {
                 fontSize: 12,
                 color: '#4caf50'
               }}>
-{t(`d6.${r.direction}`)}
+                {t(`d6.${r.direction}`)}
               </div>
             ))}
           </div>
@@ -787,7 +775,7 @@ function getElementStateStyle(state) {
 }
 
 // Situation Display Component
-function SituationDisplay({ situation, isDay }) {
+function SituationDisplay({ situation, isDay, t }) {
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{
@@ -816,7 +804,7 @@ function SituationDisplay({ situation, isDay }) {
             fontSize: 11,
             color: isDay ? '#c8a84b' : '#c0c0f0'
           }}>
-            {isDay ? '日占' : '夜占'}
+            {isDay ? t('d6.dayDivination') : t('d6.nightDivination')}
           </div>
         </div>
         <div style={{
@@ -923,7 +911,7 @@ export default function Da6() {
     out += result.situation.name + " - " + result.situation.description + "\n";
 
     // Add day/night
-    out += result.isDay ? "日占\n" : "夜占\n";
+    out += (result.isDay ? t('d6.dayDivination') : t('d6.nightDivination')) + "\n";
 
     // Add three transmissions
     out += "\n【三傳】\n";
@@ -943,7 +931,7 @@ export default function Da6() {
 
     // Add five elements analysis
     out += "\n【五行分析】\n";
-    out += "平衡度：" + (result.elementAnalysis.balanced ? "平衡" : "不平衡") + "\n";
+    out += t('d6.elementBalance') + "：" + (result.elementAnalysis.balanced ? t('d6.balanced') : t('d6.unbalanced')) + "\n";
     out += "元素统计：" + JSON.stringify(result.elementAnalysis.elementCounts) + "\n";
 
     // Add divine spirits analysis
@@ -952,17 +940,27 @@ export default function Da6() {
     if (ss.tianYiGuiRen.branches.length > 0) {
       out += "天乙贵人：" + ss.tianYiGuiRen.branches.join("、") + " - " + ss.tianYiGuiRen.description + "\n";
     }
-    out += "月德：" + ss.yueDeHe.yueDe.branch + " - " + ss.yueDeHe.yueDe.description + "\n";
-    out += "月合：" + ss.yueDeHe.yueHe.branch + " - " + ss.yueDeHe.yueHe.description + "\n";
+    if (ss.yueDeHe.yueDe.branch) {
+      out += "月德：" + ss.yueDeHe.yueDe.branch + " - " + ss.yueDeHe.yueDe.description + "\n";
+    }
+    if (ss.yueDeHe.yueHe.branch) {
+      out += "月合：" + ss.yueDeHe.yueHe.branch + " - " + ss.yueDeHe.yueHe.description + "\n";
+    }
     if (ss.sanQiLiuYi.sanQi.active) {
       out += "三奇：" + ss.sanQiLiuYi.sanQi.description + "\n";
     }
     if (ss.sanQiLiuYi.liuYi.active) {
       out += "六仪：" + ss.sanQiLiuYi.liuYi.description + "\n";
     }
-    out += "驿马：" + ss.yiMaTaoHuaHuaGai.yiMa.branch + " - " + ss.yiMaTaoHuaHuaGai.yiMa.description + "\n";
-    out += "桃花：" + ss.yiMaTaoHuaHuaGai.taoHua.branch + " - " + ss.yiMaTaoHuaHuaGai.taoHua.description + "\n";
-    out += "华盖：" + ss.yiMaTaoHuaHuaGai.huaGai.branch + " - " + ss.yiMaTaoHuaHuaGai.huaGai.description + "\n";
+    if (ss.yiMaTaoHuaHuaGai.yiMa.branch) {
+      out += "驿马：" + ss.yiMaTaoHuaHuaGai.yiMa.branch + " - " + ss.yiMaTaoHuaHuaGai.yiMa.description + "\n";
+    }
+    if (ss.yiMaTaoHuaHuaGai.taoHua.branch) {
+      out += "桃花：" + ss.yiMaTaoHuaHuaGai.taoHua.branch + " - " + ss.yiMaTaoHuaHuaGai.taoHua.description + "\n";
+    }
+    if (ss.yiMaTaoHuaHuaGai.huaGai.branch) {
+      out += "华盖：" + ss.yiMaTaoHuaHuaGai.huaGai.branch + " - " + ss.yiMaTaoHuaHuaGai.huaGai.description + "\n";
+    }
 
     // Add branch relationships
     out += "\n【地支关系】\n";
@@ -971,7 +969,7 @@ export default function Da6() {
       out += "六合：" + br.liuHe.map(r => r.element + "合").join("、") + " - " + br.liuHe[0].description + "\n";
     }
     if (br.liuChong.length > 0) {
-      out += "六冲：" + br.liuChong.length + "处 - " + br.liuChong[0].description + "\n";
+      out += "六冲：" + br.liuChong.map(r => r.element + "冲").join("、") + " - " + br.liuChong[0].description + "\n";
     }
     if (br.sanHe?.active) {
       out += "三合：" + br.sanHe.name + " - " + br.sanHe.description + "\n";
@@ -998,7 +996,7 @@ export default function Da6() {
     out += "死：" + result.elementStates.summary.si + "\n";
 
     // Add overall fortune
-    out += "\n【综合卦象】\n";
+    out += "\n【" + t('d6.overallSign') + "】\n";
     out += getFortuneLabel(result.overallFortune) + "\n";
     out += getFortuneDescription(result.overallFortune) + "\n";
 
@@ -1200,6 +1198,7 @@ export default function Da6() {
           <SituationDisplay
             situation={result.situation}
             isDay={result.isDay}
+            t={t}
           />
 
           {/* Pillars display */}
@@ -1220,21 +1219,22 @@ export default function Da6() {
           </div>
 
           {/* Three Transmissions */}
-          <ThreeTransmissionsDisplay transmissions={result.transmissions} />
+          <ThreeTransmissionsDisplay transmissions={result.transmissions} t={t} />
 
           {/* Four Classes */}
-          <FourClassesDisplay classes={result.classes} />
+          <FourClassesDisplay classes={result.classes} t={t} />
 
           {/* Heaven Pan and Earth Pan */}
           <HeavenPanDisplay
             generalsPan={result.generalsPan}
+            t={t}
           />
 
           {/* Five Elements Analysis */}
-          <FiveElementsDisplay elementAnalysis={result.elementAnalysis} />
+          <FiveElementsDisplay elementAnalysis={result.elementAnalysis} t={t} />
 
           {/* Vacancies */}
-          <VacanciesDisplay vacancies={result.vacancies} />
+          <VacanciesDisplay vacancies={result.vacancies} t={t} />
 
           {/* Divine Spirits */}
           <ShenShaDisplay shenShaAnalysis={result.shenShaAnalysis} />
@@ -1255,7 +1255,7 @@ export default function Da6() {
             maxWidth: 400
           }}>
             <div style={{ fontSize: 12, letterSpacing: 4, color: '#c8a84b', marginBottom: 12 }}>
-              综合卦象
+              {t('d6.overallSign')}
             </div>
             <div style={{
               fontSize: 24,
