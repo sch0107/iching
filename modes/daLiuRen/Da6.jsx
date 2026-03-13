@@ -595,7 +595,7 @@ function BranchRelationshipsDisplay({ branchRelationships, t }) {
                 fontSize: 12,
                 color: '#4caf50'
               }}>
-{t(`d6.${r.direction}`)}方
+{t(`d6.${r.direction}`)}
               </div>
             ))}
           </div>
