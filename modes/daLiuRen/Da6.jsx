@@ -969,7 +969,7 @@ export default function Da6() {
       out += "六合：" + br.liuHe.map(r => r.element + "合").join("、") + " - " + br.liuHe[0].description + "\n";
     }
     if (br.liuChong.length > 0) {
-      out += "六冲：" + br.liuChong.map(r => r.element + "冲").join("、") + " - " + br.liuChong[0].description + "\n";
+      out += "六冲：" + br.liuChong.map(r => "冲").join("、") + " - " + br.liuChong[0].description + "\n";
     }
     if (br.sanHe?.active) {
       out += "三合：" + br.sanHe.name + " - " + br.sanHe.description + "\n";

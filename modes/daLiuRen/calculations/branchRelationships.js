@@ -38,6 +38,7 @@ export function checkLiuChong(branch1, branch2) {
     return {
       active: true,
       relationship: '六冲',
+      element: clash.branch1 + clash.branch2,
       fortune: LIU_CHONG.fortune,
       description: LIU_CHONG.description
     };
@@ -204,10 +205,12 @@ export function checkAllBranchRelationships(branches) {
   }
 
   // Check for 方
+  const fangSet = new Set();
   for (const branch of branches) {
     const fangResult = checkFang(branch);
-    if (fangResult.active) {
+    if (fangResult.active && !fangSet.has(fangResult.direction)) {
       result.fang.push(fangResult);
+      fangSet.add(fangResult.direction);
     }
   }
 
